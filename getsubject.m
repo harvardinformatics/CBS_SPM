@@ -17,7 +17,17 @@ structrun = [4];
 boldruns = [5];
 fmruns = [6 7];
 subjectid = '120418_spmtest';
-destpath = '/tmp'
+destpath = '/tmp';
+
+% Has this been run before?
+blah = dir([destpath '/' subjectid]);
+
+if length(blah)~=0
+    error([destpath '/' subjectid ' appears to have contents.  Please pull data to a location with no contents to avoid file collisions.'])
+end
+
+% Get current wd
+startingwd = pwd;
 
 %% Construct the call to cbs_get
 % An example call is:
@@ -37,11 +47,12 @@ cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
 
 disp('Running cbsget as follows:')
 disp(cbscmd)
-[status,result] = system(cbscmd);
 
-if status~=0
-   error(['cbsget could not be run successfully!' 10 result])
-end
+% [status,result] = system(cbscmd);
+% 
+% if status~=0
+%    error(['cbsget could not be run successfully!' 10 result])
+% end
 
 %%  Unzip the files to the specified directory
 
@@ -59,7 +70,7 @@ disp('...complete!')
 
 %% Create the directory structure 
 
-dirnames = {'Analysis','Batch','Preprocessed'};
+dirnames = {'analysis','batch','preprocessed'};
 
 for d = 1:length(dirnames)
     
@@ -96,7 +107,7 @@ for b = 1:length(boldruns)
         brname = bruns(br).name;
         parsed = regexp(brname,'-','split');
         newname = ['f-run' newrunstr '-' sprintf('%03d',str2num(parsed{3})) brname(end-3:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' brname ' ' destpath '/' subjectid '/Preprocessed/' newname];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' brname ' ' destpath '/' subjectid '/preprocessed/' newname];
         [status,result] = system(cmdname);
     
         if status~=0
@@ -115,7 +126,7 @@ srun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
 for sr = 1:length(srun)
     srname = srun(sr).name;
     newname = ['s-struct' brname(end-3:end)];
-    cmdname = ['mv ' destpath '/' subjectid '/RAW/' srname ' ' destpath '/' subjectid '/Preprocessed/' newname];
+    cmdname = ['mv ' destpath '/' subjectid '/RAW/' srname ' ' destpath '/' subjectid '/preprocessed/' newname];
     [status,result] = system(cmdname);
     
     if status~=0
@@ -132,8 +143,8 @@ if length(fmruns)==2
     mrun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
-        newname = ['s-fieldmap_mag-' brname(end-5:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/Preprocessed/' newname];
+        newname = ['s-fieldmap_mag-' mrname(end-5:end)];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preprocessed/' newname];
         [status,result] = system(cmdname);
         
         if status~=0
@@ -146,7 +157,7 @@ if length(fmruns)==2
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
         newname = ['s-fieldmap_phase' brname(end-3:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/Preprocessed/' newname];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preprocessed/' newname];
         [status,result] = system(cmdname);
         
         if status~=0
@@ -189,6 +200,19 @@ rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.dcm'];
 if status~=0
    error(['DICOM files could not be removed!' 10 result])
 end
+
+disp('Removing zip file from CBS...')
+
+cd(startingwd)
+
+rmcmd = ['rm ' subjectid '.zip'];
+
+[status,result] = system(rmcmd);
+
+if status~=0
+   error(['Original zip file could not be removed!' 10 result])
+end
+
 
 disp('...Complete!')
 
