@@ -13,11 +13,11 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath)
 %% Do error checking on the inputs
 
 % in my test - delete this eventually!
-structrun = [4];
-boldruns = [5];
-fmruns = [6 7];
-subjectid = '120418_spmtest';
-destpath = '/tmp';
+% structrun = [4];
+% boldruns = [5];
+% fmruns = [6 7];
+% subjectid = '120418_spmtest';
+% destpath = '/tmp';
 
 % Has this been run before?
 blah = dir([destpath '/' subjectid]);
@@ -48,11 +48,11 @@ cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
 disp('Running cbsget as follows:')
 disp(cbscmd)
 
-% [status,result] = system(cbscmd);
-% 
-% if status~=0
-%    error(['cbsget could not be run successfully!' 10 result])
-% end
+[status,result] = system(cbscmd);
+
+if status~=0
+   error(['cbsget could not be run successfully!' 10 result])
+end
 
 %%  Unzip the files to the specified directory
 
@@ -125,7 +125,7 @@ runstr = sprintf('%03d',structrun(1));
 srun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
 for sr = 1:length(srun)
     srname = srun(sr).name;
-    newname = ['s-struct' brname(end-3:end)];
+    newname = ['s-struct' srname(end-3:end)];
     cmdname = ['mv ' destpath '/' subjectid '/RAW/' srname ' ' destpath '/' subjectid '/preprocessed/' newname];
     [status,result] = system(cmdname);
     
@@ -156,7 +156,7 @@ if length(fmruns)==2
     mrun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
-        newname = ['s-fieldmap_phase' brname(end-3:end)];
+        newname = ['s-fieldmap_phase' mrname(end-3:end)];
         cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preprocessed/' newname];
         [status,result] = system(cmdname);
         
