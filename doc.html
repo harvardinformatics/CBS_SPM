@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Scripts for Managing fMRI Data</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="Scripts for Managing fMRI Data"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="May, 2012"/>
+<meta name="author" content="Caitlin Carey, Stephanie McMains, Alex Storer"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  html { font-family: Times, serif; font-size: 12pt; }
+  .title  { text-align: center; }
+  .todo   { color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #add8e6; font-weight:normal }
+  .target { }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
+  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
+  .center {margin-left:auto; margin-right:auto; text-align:center;}
+  p.verse { margin-left: 3% }
+  pre {
+	border: 1pt solid #AEBDCC;
+	background-color: #F3F5F7;
+	padding: 5pt;
+	font-family: courier, monospace;
+        font-size: 90%;
+        overflow:auto;
+  }
+  table { border-collapse: collapse; }
+  td, th { vertical-align: top;  }
+  th.right  { text-align:center;  }
+  th.left   { text-align:center;   }
+  th.center { text-align:center; }
+  td.right  { text-align:right;  }
+  td.left   { text-align:left;   }
+  td.center { text-align:center; }
+  dt { font-weight: bold; }
+  div.figure { padding: 0.5em; }
+  div.figure p { text-align: center; }
+  div.inlinetask {
+    padding:10px;
+    border:2px solid gray;
+    margin:10px;
+    background: #ffffcc;
+  }
+  textarea { overflow-x: auto; }
+  .linenr { font-size:smaller }
+  .code-highlighted {background-color:#ffff00;}
+  .org-info-js_info-navigation { border-style:none; }
+  #org-info-js_console-label { font-size:10px; font-weight:bold;
+                               white-space:nowrap; }
+  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
+                                 font-weight:bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="sty.css" />
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">Scripts for Managing fMRI Data</h1>
+
+
+
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Goals</a>
+<ul>
+<li><a href="#sec-1-1">1.1 Prerequisites</a></li>
+<li><a href="#sec-1-2">1.2 Summary</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2 <code>getsubject.m</code></a></li>
+<li><a href="#sec-3">3 Acknowledgments</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Goals</h2>
+<div class="outline-text-2" id="text-1">
+
+<p>This document describes the suite of scripts written to help you
+interact with <code>cbsget</code> and <code>spm</code>.
+</p>
+
+</div>
+
+<div id="outline-container-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Prerequisites</h3>
+<div class="outline-text-3" id="text-1-1">
+
+<p>All scripts require that you be on the cluster, and were tested using
+Matlab 2011a.  (Use with other versions is unsupported, and is known
+to fail using Matlab 2007)
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Summary</h3>
+<div class="outline-text-3" id="text-1-2">
+
+
+<p>
+The following scripts have been written
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">Script Name</th><th scope="col" class="left">Location</th><th scope="col" class="left">Details</th></tr>
+</thead>
+<tbody>
+<tr><td class="left"><code>getsubject.m</code></td><td class="left"><code>/path/to/file</code></td><td class="left">Pulls data using <code>cbsget</code> and creates a directory structure</td></tr>
+<tr><td class="left"><code>does not exist</code></td><td class="left">lkj</td><td class="left">lkj</td></tr>
+<tr><td class="left"><code>still doesn't exist</code></td><td class="left">klj</td><td class="left">iwoe</td></tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> <code>getsubject.m</code></h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+<code>getsubject.m</code> is a script that pulls data from the central
+repository, and creates a directory structure for it.  <code>getsubject</code>
+may be called from within Matlab or from the command line.  It takes
+the following inputs:
+</p>
+<p>
+<code>GETSUBJECT(subjectid, boldruns, structrun, fmruns, destpath)</code>
+</p><table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /></colgroup>
+<colgroup><col class="left" /></colgroup>
+<thead>
+<tr><th scope="col" class="left">Input</th><th scope="col" class="left">Description</th></tr>
+</thead>
+<tbody>
+<tr><td class="left"><code>subjectid</code></td><td class="left">the name of the subject, as as string</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>boldruns</code></td><td class="left">a vector of the BOLD runs</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>structrun</code></td><td class="left">a vector of the single struct-run</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>fmruns</code></td><td class="left">a vector of the field-mapping runs</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>destpath</code></td><td class="left">the location to place the output</td></tr>
+</tbody>
+</table>
+
+
+<p>
+For example:
+</p>
+
+
+<pre class="example">getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
+</pre>
+
+
+<p>
+This creates the following directory tree:
+</p>
+
+
+<pre class="example">|-tmp   
+|---120418_spmtest
+|-----RAW
+|-----analysis
+|-----batch
+|-----preprocessed
+</pre>
+
+
+<p>
+Within the <code>RAW</code> directory is a tarball (<code>[subjectname].tar.gz</code>)
+containing the DICOMs in a compressed format.  <code>spm</code> has also been
+used to convert the files from <code>.dcm</code> format to <code>.img</code> and <code>.hdr</code>
+formats in the <code>preprocessed</code> directory.
+</p>
+<p>
+The files have also been renamed.  Because they are already in the
+subject directory, they have been stripped of their subjectid, and are
+renamed as follows:
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /></colgroup>
+<colgroup><col class="left" /></colgroup>
+<thead>
+<tr><th scope="col" class="left">File name</th><th scope="col" class="left">Description</th></tr>
+</thead>
+<tbody>
+<tr><td class="left"><code>f-run001-006.img</code></td><td class="left">Image 6 of the first BOLD run</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>s-struct.img</code></td><td class="left">The structural image for the subject</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>s-fieldmap-mag-01.img</code></td><td class="left">The magnitude of the fieldmap (if provided)</td></tr>
+</tbody>
+<tbody>
+<tr><td class="left"><code>s-fieldmap_phase.img</code></td><td class="left">The phase of the fieldmap</td></tr>
+</tbody>
+</table>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Acknowledgments</h2>
+<div class="outline-text-2" id="text-3">
+
+<p>These scripts were written by Alex Storer, Caitlin Carey and Stephanie
+McMains with additional assistance from David Dodell-Feder.
+</p></div>
+</div>
+</div>
+
+<div id="postamble">
+Harvard is super. <a
+href="mailto:foo@bar.baz">E-mail</a> for help.
+</div>
+</body>
+</html>
