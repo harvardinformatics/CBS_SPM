@@ -107,7 +107,7 @@ for b = 1:length(boldruns)
         brname = bruns(br).name;
         parsed = regexp(brname,'-','split');
         newname = ['f-run' newrunstr '-' sprintf('%03d',str2num(parsed{3})) brname(end-3:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' brname ' ' destpath '/' subjectid '/preprocessed/' newname];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' brname ' ' destpath '/' subjectid '/preproc/' newname];
         [status,result] = system(cmdname);
     
         if status~=0
@@ -126,7 +126,7 @@ srun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
 for sr = 1:length(srun)
     srname = srun(sr).name;
     newname = ['s-struct' srname(end-3:end)];
-    cmdname = ['mv ' destpath '/' subjectid '/RAW/' srname ' ' destpath '/' subjectid '/preprocessed/' newname];
+    cmdname = ['mv ' destpath '/' subjectid '/RAW/' srname ' ' destpath '/' subjectid '/preproc/' newname];
     [status,result] = system(cmdname);
     
     if status~=0
@@ -144,7 +144,7 @@ if length(fmruns)==2
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
         newname = ['s-fieldmap_mag-' mrname(end-5:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preprocessed/' newname];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preproc/' newname];
         [status,result] = system(cmdname);
         
         if status~=0
@@ -157,7 +157,7 @@ if length(fmruns)==2
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
         newname = ['s-fieldmap_phase' mrname(end-3:end)];
-        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preprocessed/' newname];
+        cmdname = ['mv ' destpath '/' subjectid '/RAW/' mrname ' ' destpath '/' subjectid '/preproc/' newname];
         [status,result] = system(cmdname);
         
         if status~=0
