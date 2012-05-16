@@ -1,6 +1,7 @@
 import argparse
 import glob,re
 
+errorlog = ''
 
 def getNumRuns(spath,s):
     print spath+'/'+s+'/preproc'
@@ -15,11 +16,22 @@ def getNumRuns(spath,s):
 
 
 def getNumPts(spath,s):
-    print spath+'/'+s+'/preproc'
+    global errorlog    
     fruns = glob.glob(spath+'/'+s+'/preproc/*run*')
+    print 'glob:' + spath+'/'+s+'/preproc/*run*'
+    print fruns
     nPts = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
     nRuns = getNumRuns(spath,s)
-    for i = range(1,nRuns+1)
+    for i in range(1,nRuns+1):
+        fruns = glob.glob(spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*')
+        print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
+        print fruns
+        nPts_i = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
+        if nPts_i != nPts:
+            errorlog = errorlog+"Subject " +s+ " has mismached numbers of points"
+            return None
+            
+        
     
 # parse the arguments
 
@@ -50,18 +62,15 @@ epiList = re.findall('.*run\d+-(\d+)',origtemplate)
 nPts = reduce(max,map(int,epiList))
 origPath = re.findall('(/.*)/preproc/',origtemplate)[0]
 
-
-
-errorlog = ''
-
 for s in sublist:
+    print "Processing subject: "+s
     destPath = spath+'/'+s
     subRuns = getNumRuns(spath,s)
     subPts = getNumPts(spath,s)
     if subRuns != nOrigRuns:
         errorlog+="Subject "+ s +" has " + str(subRuns) + " runs, not " + str(nOrigRuns) + " runs.\n"
         break
-    if subPts != nOrigRuns:
+    if subPts != nPts:
         errorlog+="Subject "+ s +" has " + str(subPts) + " points, not " + str(nPts) + " points.\n"
         break
     nextBatch = origtemplate
