@@ -102,7 +102,7 @@ for b = 1:length(boldruns)
     disp('Moving Bold Runs...')
     runstr = sprintf('%04d',boldruns(b));
     newrunstr = sprintf('%03d',b);
-    bruns = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
+    bruns = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     for br = 1:length(bruns)
         brname = bruns(br).name;
         parsed = regexp(brname,'-','split');
@@ -122,7 +122,7 @@ disp('...complete!')
 
 disp('Moving Structural Run...')
 runstr = sprintf('%03d',structrun(1));
-srun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
+srun = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
 for sr = 1:length(srun)
     srname = srun(sr).name;
     newname = ['s-struct' srname(end-3:end)];
@@ -140,7 +140,7 @@ if length(fmruns)==2
     disp('Moving Field Maps...')
     % magnitude
     runstr = sprintf('%03d',fmruns(1));
-    mrun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
+    mrun = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
         newname = ['s-fieldmap_mag-' mrname(end-5:end)];
@@ -153,7 +153,7 @@ if length(fmruns)==2
     end
     % phase
     runstr = sprintf('%03d',fmruns(2));
-    mrun = dir([destpath '/' subjectid '/RAW/*' runstr '*']);
+    mrun = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     for mr = 1:length(mrun)
         mrname = mrun(mr).name;
         newname = ['s-fieldmap_phase' mrname(end-3:end)];
@@ -171,7 +171,10 @@ end
 
 origfiles = dir([destpath '/' subjectid '/RAW/*']);
 
-tgzcmd = ['tar -cvzf ' destpath '/' subjectid '/RAW/' subjectid '.tar.gz '  destpath '/' subjectid '/RAW/*'];
+thisdir = pwd();
+cd([destpath '/' subjectid '/RAW/']);
+tgzcmd = ['tar -cvzf ' destpath '/' subjectid '/RAW/' subjectid '.tar.gz '  '*'];
+
 
 disp('Rearchiving data as follows:')
 disp(tgzcmd)
@@ -183,6 +186,8 @@ end
 
 disp('Complete!')
 
+cd(thisdir)
+
 disp('Removing uncompressed files...')
 
 rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.gif'];
@@ -190,7 +195,7 @@ rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.gif'];
 [status,result] = system(rmcmd);
 
 if status~=0
-   error(['.gif files could not removed!' 10 result])
+   warning(['.gif files could not removed!' 10 result])
 end
 
 rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.dcm'];
