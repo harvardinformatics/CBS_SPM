@@ -4,7 +4,6 @@ import glob,re
 errorlog = ''
 
 def getNumRuns(spath,s):
-    print spath+'/'+s+'/preproc'
     fruns = glob.glob(spath+'/'+s+'/preproc/*run*')
     maxruns = 0    
     for fname in fruns:
@@ -19,17 +18,17 @@ def getNumPts(spath,s):
     global errorlog    
     fruns = glob.glob(spath+'/'+s+'/preproc/*run*')
     print 'glob:' + spath+'/'+s+'/preproc/*run*'
-    print fruns
     nPts = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
+    print nPts
     nRuns = getNumRuns(spath,s)
     for i in range(1,nRuns+1):
         fruns = glob.glob(spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*')
         print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
-        print fruns
         nPts_i = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
         if nPts_i != nPts:
             errorlog = errorlog+"Subject " +s+ " has mismached numbers of points"
             return None
+    return nPts
             
         
     
@@ -79,3 +78,4 @@ for s in sublist:
     fout.write(nextBatch)
     fout.close()
 
+print errorlog
