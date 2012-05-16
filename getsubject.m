@@ -4,11 +4,13 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath)
 %   data using cbsget, processes it with spm and renames the files and
 %   puts them in an ordered directory structure.
 %
-%   subjectid:  the name of the subject on the network test
-%   boldruns:   the run numbers for the BOLD scans
-%   structrun:  the run number for the structural scan
-%   fmruns:     the run numbers for the field map scan
-%   destpath:   the path where this data will go after conversion
+%   subjectid:  the name of the subject in CBSCentral (in single quotes, e.g. 'my_subj_name')
+%   boldruns:   the run numbers for the BOLD scans (in brackets if more than one run, e.g. 1 or [1,2])
+%   structrun:  the run number for the structural scan (same as boldruns)
+%   fmruns:     the run numbers for the fieldmap scan (same as boldruns)
+%               The fieldmap is optional. If you don't have one, put empty brackets, e.g. []
+%
+%   destpath:   the path where this data will go after conversion (in signle quotes, e.g. '/users/me/data')
 
 %% Do error checking on the inputs
 
