@@ -1,5 +1,5 @@
 import argparse
-import glob,re
+import glob,re,os.path
 
 errorlog = ''
 
@@ -17,9 +17,9 @@ def getNumRuns(spath,s):
 def getNumPts(spath,s):
     global errorlog    
     fruns = glob.glob(spath+'/'+s+'/preproc/*run*')
-    print 'glob:' + spath+'/'+s+'/preproc/*run*'
+    #print 'glob:' + spath+'/'+s+'/preproc/*run*'
     nPts = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
-    print nPts
+    #print nPts
     nRuns = getNumRuns(spath,s)
     for i in range(1,nRuns+1):
         fruns = glob.glob(spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*')
@@ -32,29 +32,32 @@ def getNumPts(spath,s):
             
         
     
-# parse the arguments
-
-parser = argparse.ArgumentParser(description='klasdfkjasdf')
+parser = argparse.ArgumentParser(description='Generate new SPM batch files from a template.')
 parser.add_argument('-t','--template', help='Template batch file', required=True)
 parser.add_argument('-p','--path', help='Path to subjects', required=True, nargs=1)
 parser.add_argument('-s','--subjects', help='List of subjects', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='File containing subjects', required=False)
 args = vars(parser.parse_args())
 
-print args
-
 f = open(args["template"])
 origtemplate = f.read()
+finalname = 'preproc.m'
+finalname = os.path.basename(args["template"])
 f.close()
 
-
 spath = args["path"][0]
+
+# remove a trailing slash if it's there
+if spath[-1]=='/':
+    spath = spath[0:-1]
 
 if args["subjects"]:
     sublist = args["subjects"]
 elif args["subjectfile"]:
-    print "do this later"
-
+    fsf = open(args["subjectfile"],'r')
+    sublist = fsf.split('\n')
+    fsf.close()
+    
 runList = re.findall('.*run(\d+)',origtemplate)
 nOrigRuns = reduce(max,map(int,runList))
 epiList = re.findall('.*run\d+-(\d+)',origtemplate)
@@ -74,7 +77,7 @@ for s in sublist:
         break
     nextBatch = origtemplate
     nextBatch = nextBatch.replace(origPath,destPath)
-    fout = open(destPath+'/batch/preproc.m','w')
+    fout = open(destPath+'/batch/'+finalname,'w')
     fout.write(nextBatch)
     fout.close()
 

@@ -1,0 +1,120 @@
+#+TITLE: Scripts for Managing fMRI Data
+#+AUTHOR: Caitlin Carey, Stephanie McMains, Alex Storer
+#+EMAIL: smcmains@fas.harvard.edu
+#+DATE: May, 2012
+
+
+* Goals
+This document describes the suite of scripts written to help you
+interact with ~cbsget~ and ~spm~.
+
+** Prerequisites
+All scripts require that you be on the cluster, and were tested using
+Matlab 2011a.  (Use with other versions is unsupported, and is known
+to fail using Matlab 2007)
+
+** Summary
+
+The following scripts have been written
+
+| Script Name           | Location        | Details                                                     |
+|-----------------------+-----------------+-------------------------------------------------------------|
+| ~getsubject.m~        | ~/path/to/file~ | Pulls data using ~cbsget~ and creates a directory structure |
+| ~genPreprocBatch.py~  | ~/path/to/file~ | Generates preprocessing batches from template               |
+| ~still doesn't exist~ | klj             | iwoe                                                        |
+|                       |                 |                                                             |
+
+* ~getsubject.m~
+
+~getsubject.m~ is a script that pulls data from the central
+repository, and creates a directory structure for it.  ~getsubject~
+may be called from within Matlab or from the command line.  It takes
+the following inputs:
+
+~GETSUBJECT(subjectid, boldruns, structrun, fmruns, destpath)~
+|-------------+---------------------------------------|
+| Input       | Description                           |
+|-------------+---------------------------------------|
+| ~subjectid~ | the name of the subject, as as string |
+|-------------+---------------------------------------|
+| ~boldruns~  | a vector of the BOLD runs             |
+|-------------+---------------------------------------|
+| ~structrun~ | a vector of the single struct-run     |
+|-------------+---------------------------------------|
+| ~fmruns~    | a vector of the field-mapping runs    |
+|-------------+---------------------------------------|
+| ~destpath~  | the location to place the output      |
+|-------------+---------------------------------------|
+
+For example:
+#+begin_example
+getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
+#+end_example
+
+This creates the following directory tree:
+#+begin_example
+   |-tmp   
+   |---120418_spmtest
+   |-----RAW
+   |-----analysis
+   |-----batch
+   |-----preprocessed
+#+end_example
+
+Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
+containing the DICOMs in a compressed format.  ~spm~ has also been
+used to convert the files from ~.dcm~ format to ~.img~ and ~.hdr~
+formats in the ~preprocessed~ directory.
+
+The files have also been renamed.  Because they are already in the
+subject directory, they have been stripped of their subjectid, and are
+renamed as follows:
+
+|-------------------------+---------------------------------------------|
+| File name               | Description                                 |
+|-------------------------+---------------------------------------------|
+| /                       | <>                                          |
+| ~f-run001-006.img~      | Image 6 of the first BOLD run               |
+|-------------------------+---------------------------------------------|
+| ~s-struct.img~          | The structural image for the subject        |
+|-------------------------+---------------------------------------------|
+| ~s-fieldmap-mag-01.img~ | The magnitude of the fieldmap (if provided) |
+|-------------------------+---------------------------------------------|
+| ~s-fieldmap_phase.img~  | The phase of the fieldmap                   |
+|-------------------------+---------------------------------------------|
+
+
+* ~genPreprocBatch.py~
+
+The goal of this script is to obviate the repeated use of the SPM GUI.
+Using the GUI once, it is possible to create a template file, then use
+this template file to generate the batch scripts for other subjects
+with the same preprocessing steps.
+
+
+~python genPreprocBatch.py -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...~
+or
+~python genPreprocBatch.py -t TEMPLATE -p PATH -f SUBJECTFILE~
+|-------------+---------------------------------------|
+| Input       | Description                           |
+|-------------+---------------------------------------|
+| ~subjectid~ | the name of the subject, as as string |
+|-------------+---------------------------------------|
+| ~boldruns~  | a vector of the BOLD runs             |
+|-------------+---------------------------------------|
+| ~structrun~ | a vector of the single struct-run     |
+|-------------+---------------------------------------|
+| ~fmruns~    | a vector of the field-mapping runs    |
+|-------------+---------------------------------------|
+| ~destpath~  | the location to place the output      |
+|-------------+---------------------------------------|
+
+For example:
+#+begin_example
+getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
+#+end_example
+
+
+* Acknowledgments
+These scripts were written by Alex Storer, Caitlin Carey and Stephanie
+McMains with additional assistance from David Dodell-Feder.
