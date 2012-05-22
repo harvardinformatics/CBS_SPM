@@ -87,20 +87,15 @@ for d = 1:length(dirnames)
     end
     
 end
+    
+mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
 
+disp('Making new directory as follows:')
+disp(mkcmd)
+[status,result] = system(mkcmd);
 
-for d = 1:length(dirnames)
-    
-    mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
-    
-    disp('Making new directory as follows:')
-    disp(mkcmd)
-    [status,result] = system(mkcmd);
-    
-    if status~=0
-        error(['mkdir command could not be run successfully!' 10 result])
-    end
-    
+if status~=0
+    error(['mkdir command could not be run successfully!' 10 result])
 end
 
 %% Run spm convert on the files
