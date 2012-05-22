@@ -72,11 +72,26 @@ disp('...complete!')
 
 %% Create the directory structure 
 
-dirnames = {'analysis','batch','preproc','paradigms'};
+dirnames = {'analysis','batch','preproc'};
 
 for d = 1:length(dirnames)
     
     mkcmd = ['mkdir ' destpath '/' subjectid '/' dirnames{d}];
+    
+    disp('Making new directory as follows:')
+    disp(mkcmd)
+    [status,result] = system(mkcmd);
+    
+    if status~=0
+        error(['mkdir command could not be run successfully!' 10 result])
+    end
+    
+end
+
+
+for d = 1:length(dirnames)
+    
+    mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
     
     disp('Making new directory as follows:')
     disp(mkcmd)
@@ -105,7 +120,7 @@ for b = 1:length(boldruns)
     runstr = sprintf('%04d',boldruns(b));
     newrunstr = sprintf('%03d',b);
     % also make sub-directories for the paradigms
-    mkcmd = ['mkdir ' destpath '/' subjectid '/paradigms/' newrunstr];
+    mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms/run' newrunstr];
     disp('Making new directory as follows:')
     disp(mkcmd)
     [status,result] = system(mkcmd);
