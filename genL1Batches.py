@@ -86,12 +86,20 @@ for s in sublist:
         # we can use re.sub to replace only the first occurrence, but how will we replace
         # only the second occurrence?
         #
-        # one way may be to use split.  i can keep splitting the string and then putting it back together.
+        # solution: use split.  we'll keep the processed half and the unprocessed half separate
+        unprocBatch = nextBatch
+        procBatch = ""
         for cond in pNames:
             fonset = open(destPath+'/paradigms/run'+str.zfill(str(r),3)+'/'+cond+'.txt')
-            nextonsets = 'onset = ['+str.replace(fonset.read(),'\n','; ')+'];'
-            nextBatch.seek(nextBatch.find("'"+cond+"'"))
-            re.sub("onset =(.*?);",nextonsets,nextBatch,flags=re.DOTALL)
+            nextonsets = 'onset = ['+str.replace(fonset.read(),'\n','; ')+']'
+            splitBatch = unprocBatch.split("'"+cond+"'")
+            procBatch+=splitBatch[0]+"'"+cond+"'"
+            unprocBatch = splitBatch[1]
+            oldonsets =  re.search("onset =(.*?);",unprocBatch,flags=re.DOTALL).group(1)
+            splitBatch = unprocBatch.split(oldonsets)
+            procBatch+=splitBatch[0]+nextonsets+";"
+            unprocBatch = splitBatch[1]
+        nextBatch = procBatch+unprocBatch
     fout = open(destPath+'/batch/'+finalname,'w')
     fout.write(nextBatch)
     fout.close()
