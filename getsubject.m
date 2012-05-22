@@ -22,9 +22,9 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath)
 % destpath = '/tmp';
 
 % Has this been run before?
-blah = dir([destpath '/' subjectid]);
+dircontents = dir([destpath '/' subjectid]);
 
-if length(blah)~=0
+if length(dircontents)~=0
     error([destpath '/' subjectid ' appears to have contents.  Please pull data to a location with no contents to avoid file collisions.'])
 end
 
@@ -72,7 +72,7 @@ disp('...complete!')
 
 %% Create the directory structure 
 
-dirnames = {'analysis','batch','preproc'};
+dirnames = {'analysis','batch','preproc','paradigms'};
 
 for d = 1:length(dirnames)
     
@@ -104,6 +104,16 @@ for b = 1:length(boldruns)
     disp('Moving Bold Runs...')
     runstr = sprintf('%04d',boldruns(b));
     newrunstr = sprintf('%03d',b);
+    % also make sub-directories for the paradigms
+    mkcmd = ['mkdir ' destpath '/' subjectid '/paradigms/' newrunstr];
+    disp('Making new directory as follows:')
+    disp(mkcmd)
+    [status,result] = system(mkcmd);
+    
+    if status~=0
+        error(['mkdir command could not be run successfully!' 10 result])
+    end
+    
     bruns = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     for br = 1:length(bruns)
         brname = bruns(br).name;
