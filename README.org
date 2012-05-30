@@ -61,7 +61,7 @@ This creates the following directory tree:
    |-------paradigms
    |---------run001,run002,...
    |-----batch
-   |-----preprocessed
+   |-----preproc
 #+end_example
 
 Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
@@ -102,24 +102,23 @@ with the same preprocessing steps.
 ~python genPreprocBatch.py -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...~
 or
 ~python genPreprocBatch.py -t TEMPLATE -p PATH -f SUBJECTFILE~
-|-------------+---------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
 | Input         | Description                                                             |
-|-------------+---------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
 | ~TEMPLATE~    |the full path and the name of the template batch created                 |
-|               |in the SPM GUI via a "save batch as script" command, that ends in _job.m |
-|-------------+---------------------------------------------------------------------------|
+|                in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+|---------------+-------------------------------------------------------------------------|
 | ~PATH~        | the path to the directory that contains all of your subjects            |
-|-------------+---------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
 | ~SUBJECT1~    | a list separated by spaces containing your subjectids for analysis      |
-|-------------+---------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
 | ~SUBJECTFILE~ | a file containing your subjectids, with each ID on its own line         |
-|-------------+---------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
 
 
 For example:
 #+begin_example
-python genPreprocBatch.py -t /ncf/labspace/subject_dir/subject1/batch/preproc_job.m 
--p /ncf/labspace/subject_dir/ -s subject2 
+python genPreprocBatch.py -t /ncf/labspace/subject_dir/subject1/batch/preproc_job.m -p /ncf/labspace/subject_dir/ -s subject2 
 #+end_example
 
 
