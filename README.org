@@ -10,7 +10,7 @@ interact with ~cbsget~ and ~spm~.
 
 ** Prerequisites
 All scripts require that you be on the cluster, and were tested using
-Matlab 2011a.  (Use with other versions is unsupported, and is known
+Matlab 2011a with spm version 8.4667.  (Use with older versions of matlab is unsupported, and is known
 to fail using Matlab 2007)
 
 ** Summary
@@ -27,24 +27,25 @@ The following scripts have been written
 * ~getsubject.m~
 
 ~getsubject.m~ is a script that pulls data from the central
-repository, and creates a directory structure for it.  ~getsubject~
-may be called from within Matlab or from the command line.  It takes
+repository, and creates a directory structure for it that will allow the use
+of the other scripts described here for gui free analysis of spm data. 
+~getsubject~ may be called from within Matlab or from the command line.  It takes
 the following inputs:
 
 ~GETSUBJECT(subjectid, boldruns, structrun, fmruns, destpath)~
-|-------------+---------------------------------------|
-| Input       | Description                           |
-|-------------+---------------------------------------|
-| ~subjectid~ | the name of the subject, as as string |
-|-------------+---------------------------------------|
-| ~boldruns~  | a vector of the BOLD runs             |
-|-------------+---------------------------------------|
-| ~structrun~ | a vector of the single struct-run     |
-|-------------+---------------------------------------|
-| ~fmruns~    | a vector of the field-mapping runs    |
-|-------------+---------------------------------------|
-| ~destpath~  | the location to place the output      |
-|-------------+---------------------------------------|
+|-------------+-------------------------------------------------------------|
+| Input       | Description                                                 |
+|-------------+-------------------------------------------------------------|
+| ~subjectid~ | the name of the subject, as as string  in quotes            |
+|-------------+-------------------------------------------------------------|
+| ~boldruns~  | a vector of the BOLD runs, seperated by a space             |
+|-------------+-------------------------------------------------------------|
+| ~structrun~ | a vector of the single struct-run                           |
+|-------------+-------------------------------------------------------------|
+| ~fmruns~    | a vector of the field-mapping runs. If no fieldmap, use []  |
+|-------------+-------------------------------------------------------------|
+| ~destpath~  | the path to the location to place the output                |
+|-------------+-------------------------------------------------------------|
 
 For example:
 #+begin_example
@@ -57,6 +58,8 @@ This creates the following directory tree:
    |---120418_spmtest
    |-----RAW
    |-----analysis
+   |-------paradigms
+   |---------run001,run002,...
    |-----batch
    |-----preprocessed
 #+end_example
@@ -83,11 +86,15 @@ renamed as follows:
 | ~s-fieldmap_phase.img~  | The phase of the fieldmap                   |
 |-------------------------+---------------------------------------------|
 
+Within the ~analysis~ directory is a ~paradigms~ directory, with a directory for each run.
+For first level analysis, each condition should have it's own onset .txt file,
+with each row being a single onset time.  The name of the file should be the name
+given to each condition within the SPM batch, followed by the .txt extension.
 
 * ~genPreprocBatch.py~
 
-The goal of this script is to obviate the repeated use of the SPM GUI.
-Using the GUI once, it is possible to create a template file, then use
+The goal of this script is to eliminate the need for the repeated use of the SPM GUI.
+Using the GUI once, it is possible to create a template batch file, then use
 this template file to generate the batch scripts for other subjects
 with the same preprocessing steps.
 
@@ -95,23 +102,24 @@ with the same preprocessing steps.
 ~python genPreprocBatch.py -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...~
 or
 ~python genPreprocBatch.py -t TEMPLATE -p PATH -f SUBJECTFILE~
-|-------------+---------------------------------------|
-| Input       | Description                           |
-|-------------+---------------------------------------|
-| ~subjectid~ | the name of the subject, as as string |
-|-------------+---------------------------------------|
-| ~boldruns~  | a vector of the BOLD runs             |
-|-------------+---------------------------------------|
-| ~structrun~ | a vector of the single struct-run     |
-|-------------+---------------------------------------|
-| ~fmruns~    | a vector of the field-mapping runs    |
-|-------------+---------------------------------------|
-| ~destpath~  | the location to place the output      |
-|-------------+---------------------------------------|
+|-------------+---------------------------------------------------------------------------|
+| Input         | Description                                                             |
+|-------------+---------------------------------------------------------------------------|
+| ~TEMPLATE~    |the full path and the name of the template batch created                 |
+|               |in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+|-------------+---------------------------------------------------------------------------|
+| ~PATH~        | the path to the directory that contains all of your subjects            |
+|-------------+---------------------------------------------------------------------------|
+| ~SUBJECT1~    | a list separated by spaces containing your subjectids for analysis      |
+|-------------+---------------------------------------------------------------------------|
+| ~SUBJECTFILE~ | a file containing your subjectids, with each ID on its own line         |
+|-------------+---------------------------------------------------------------------------|
+
 
 For example:
 #+begin_example
-getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
+python genPreprocBatch.py -t /ncf/labspace/subject_dir/subject1/batch/preproc_job.m 
+-p /ncf/labspace/subject_dir/ -s subject2 
 #+end_example
 
 
