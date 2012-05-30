@@ -67,7 +67,7 @@ This creates the following directory tree:
 Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
 containing the DICOMs in a compressed format.  ~spm~ has also been
 used to convert the files from ~.dcm~ format to ~.img~ and ~.hdr~
-formats in the ~preprocessed~ directory.
+formats in the ~preproc~ directory.
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
@@ -76,7 +76,6 @@ renamed as follows:
 |-------------------------+---------------------------------------------|
 | File name               | Description                                 |
 |-------------------------+---------------------------------------------|
-| /                       | <>                                          |
 | ~f-run001-006.img~      | Image 6 of the first BOLD run               |
 |-------------------------+---------------------------------------------|
 | ~s-struct.img~          | The structural image for the subject        |
@@ -105,8 +104,7 @@ or
 |---------------+-------------------------------------------------------------------------|
 | Input         | Description                                                             |
 |---------------+-------------------------------------------------------------------------|
-| ~TEMPLATE~    |the full path and the name of the template batch created                 |
-|                in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+| ~TEMPLATE~    |the full path and the name of the template batch created in the SPM GUI via a "save batch as script" command, that ends in _job.m |
 |---------------+-------------------------------------------------------------------------|
 | ~PATH~        | the path to the directory that contains all of your subjects            |
 |---------------+-------------------------------------------------------------------------|
