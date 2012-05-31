@@ -74,6 +74,7 @@ for subInd = 1:length(subjects)
     % make the run file
     for n1=1:size(files,1)
         runfile=fullfile(artDir,['art_exec',num2str(n1,'%03d'),'.m']);
+        disp(['Creating runfile: ' runfile])
         [fid,msg]=fopen(runfile,'wt');
         if fid==-1
             error(['Problem creating art executable: ' msg])
