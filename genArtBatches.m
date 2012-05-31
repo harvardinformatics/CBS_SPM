@@ -1,5 +1,5 @@
 %% genArtBatches - a program for CBS to run art in batch mode, assuming SPM.mat as input.  
-%        Usage: genArtBatches (base_dir, 
+%        Usage: genArtBatches (base_dir, subjects 
 %                 use_diff_global (1,0), ==> 1-Yes, 0-No
 %                 use_diff_motion (1,0), ==> 1-Yes, 0-No
 %                 use_norms (1,0),  ==> 1-Combine all movement dimensions, 0-Not combine
@@ -8,10 +8,10 @@
 %                 motion_threshold) ==> Threshold                       
 %                                       for outlier detection based on
 %                                       motion estimate (mm)
-%                  genArtBatches('/ncf/snp/06/SPAA/CBS/MID_analysis_art,0,1,0,4,3)
+%                  genArtBatches('/ncf/snp/06/SPAA/CBS/MID_analysis_art',{'subject1','subject2','subject3'},0,1,0,4,3)
 %         This will create a subdirectory called 'art_analysis' and place
 %         in this directory a configuration file and matlab art run script.
-function genArtBatches(base_dir, input_use_diff_global, input_use_diff_motion, input_use_norms, input_global_threshold, input_motion_threshold)
+function genArtBatches(base_dir,subjects, input_use_diff_global, input_use_diff_motion, input_use_norms, input_global_threshold, input_motion_threshold)
 addpath('/ncf/snp/11/tools/art');
 thisdir = pwd();
 %%%%%%%%%%%% ART PARAMETERS (edit to desired values) %%%%%%%%%%%%
@@ -23,11 +23,8 @@ use_diff_global=input_use_diff_global;
 use_diff_motion=input_use_diff_motion;
 use_norms=input_use_norms;
 
-d = dir(base_dir);
-d_rm = strcmp({d.name},'.') | strcmp({d.name},'..') | ([d.isdir]==0);
-dirs=d(~d_rm);
-for dirInd = 1:length(dirs)
-    subjectDir = [base_dir '/' dirs(dirInd).name];
+for subInd = 1:length(subjects)
+    subjectDir = [base_dir '/' subjects{subInd}];
     artDir = [subjectDir '/art_analysis'];
     files = [subjectDir '/analysis/SPM.mat'];
     % make the configuration files
