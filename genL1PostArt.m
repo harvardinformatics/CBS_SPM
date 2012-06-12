@@ -22,14 +22,14 @@ for s = 1:nSub
     
     fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
     
-    runstrs = regexp(fcontents,'sess{(\d)}','tokens');
+    runstrs = regexp(fcontents,'sess\((\d)\)','tokens');
     nRuns = -1;
     for i = 1:length(runstrs)
         if ~isempty(runstrs{i})
             nRuns = max(nRuns,str2double(runstrs{i}{1}{1}));
         end
     end
-    
+        
     % replace the regression coefficients
     fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
     
@@ -37,7 +37,7 @@ for s = 1:nSub
     zeropad = zeros(1,nRuns);
     
     for i = 1:nRuns        
-        loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_and_movement_swrf-run%03d-001.mat',i)];
+        loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
         eval(loadstr)
         zeropad(i) = size(R,2);
     end
@@ -46,13 +46,13 @@ for s = 1:nSub
     consess_matches = regexp(fcontents,'tcon\.convec = ','split');
     consess_str = '';
     ind = 0;
-    while (length(consess_str) ~= 0)
+    while (length(consess_str) == 0)
         ind = ind+1;
         if length(consess_matches{ind})==2
-            consess_str = conses_matches{ind}{2};
+            consess_str = consess_matches{ind}{2};
         end
     end
-    digitre = '(\d\.?\d*\s?)';
+    digitre = '(-?\d\.?\d*\s?)';
     nDigits = length(regexp(consess_str,digitre));
     nPreserve = nDigits/nRuns;
     
@@ -83,14 +83,18 @@ for s = 1:nSub
             insideF = false;
         end        
         if insideF
-            fcontents{linenum} = regexprep(fcontents,findre,replacere);
+            fcontents{linenum} = regexprep(fcontents{linenum},findre,replacere);
         end                
     end
 
     % write out the updated file
     fid = fopen([fname(1:end-2) '_art.m'],'w+');
     for i = 1:length(fcontents)
-        fprintf(fid,[fcontents{i} '\n']);
+        try
+            fprintf(fid,[fcontents{i} '\n']);
+        catch
+            keyboard
+        end
     end
     fclose(fid);
 end
