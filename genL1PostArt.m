@@ -64,8 +64,27 @@ for s = 1:nSub
     
     
     % add in the zero paddings for f contrast
-    %
-    
+    replacere = [''];
+    findre = replacere;
+    for i = 1:nRuns
+        findre = [findre '(' digitre '{' num2str(nPreserve) '})'];
+        replacere = [replacere '$' num2str(i) ' ' num2str(zeros(1,zeropad(i))) ' '];
+    end
+    fcontents = regexprep(fcontents,findre,replacere);
+
+    insideF = false;
+    for linenum = 1:length(fcontents)
+        if strfind(fcontents{linenum},'fcon.convec')
+            insideF = true;            
+        else strfind(fcontents{linenum},';')
+            insideF = false;
+        end        
+        if insideF
+            fcontents{linenum} = regexprep(fcontents,findre,replacere);
+        end                
+    end
+
+    % write out the updated file
     fid = fopen([fname(1:end-3) '_art.m']);
     for i = 1:length(fcontents)
         fprintf(fid,fcontents{i});
