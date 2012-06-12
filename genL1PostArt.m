@@ -36,7 +36,7 @@ for s = 1:nSub
     % how many zeros will be added
     zeropad = zeros(1,nRuns);
     
-    for i = 1:nRuns        
+    for i = 1:nRuns
         loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
         eval(loadstr)
         zeropad(i) = size(R,2);
@@ -46,47 +46,76 @@ for s = 1:nSub
     consess_matches = regexp(fcontents,'tcon\.convec = ','split');
     consess_str = '';
     ind = 0;
-    while (length(consess_str) == 0)
+    useF = false;
+    while (isempty(consess_str))
         ind = ind+1;
+        if ind>length(consess_matches)
+            disp('No tcon.convec lines found: using F contrast instead.')
+            useF = true;
+            break
+        end
         if length(consess_matches{ind})==2
             consess_str = consess_matches{ind}{2};
         end
     end
-    digitre = '(-?\d\.?\d*\s?)';
-    nDigits = length(regexp(consess_str,digitre));
-    nPreserve = nDigits/nRuns;
     
-    replacere = ['tcon\.convec = ['];
-    findre = replacere;
-    for i = 1:nRuns
-        findre = [findre '(' digitre '{' num2str(nPreserve) '})'];
-        replacere = [replacere '$' num2str(i) ' ' num2str(zeros(1,zeropad(i))) ' '];
+    if useF
+        insideF = false;
+        for linenum = 1:length(fcontents)
+            strloc = strfind(fcontents{linenum},'fcon.convec');
+            endloc = strfind(fcontents{linenum},';');
+            if strloc
+                insideF = true;
+            elseif endloc
+                insideF = false;
+            end
+            if insideF
+                consess_str = fcontents{linenum};
+            end
+        end
     end
-    fcontents = regexprep(fcontents,findre,replacere);
     
-    
-    % add in the zero paddings for f contrast
-
-    replacere = [''];
-    findre = replacere;
-    for i = 1:nRuns
-        findre = [findre '(' digitre '{' num2str(nPreserve) '})'];
-        replacere = [replacere '$' num2str(i) ' ' num2str(zeros(1,zeropad(i))) ' '];
+    if isempty(consess_str)
+        disp('No F contrast found.  No additional zeros will be added to contrast vectors.')
+    else
+        
+        digitre = '(-?\d\.?\d*\s?)';
+        nDigits = length(regexp(consess_str,digitre));
+        nPreserve = nDigits/nRuns;
+        
+        replacere = ['tcon\.convec = ['];
+        findre = replacere;
+        for i = 1:nRuns
+            findre = [findre '(' digitre '{' num2str(nPreserve) '})'];
+            replacere = [replacere '$' num2str(i) ' ' num2str(zeros(1,zeropad(i))) ' '];
+        end
+        fcontents = regexprep(fcontents,findre,replacere);
+        
+        
+        % add in the zero paddings for f contrast
+        
+        replacere = [''];
+        findre = replacere;
+        for i = 1:nRuns
+            findre = [findre '(' digitre '{' num2str(nPreserve) '})'];
+            replacere = [replacere '$' num2str(i) ' ' num2str(zeros(1,zeropad(i))) ' '];
+        end
+        fcontents = regexprep(fcontents,findre,replacere);
+        
+        insideF = false;
+        for linenum = 1:length(fcontents)
+            strloc = strfind(fcontents{linenum},'fcon.convec');
+            endloc = strfind(fcontents{linenum},';');
+            if strloc
+                insideF = true;
+            elseif endloc 
+                insideF = false;
+            end
+            if insideF
+                fcontents{linenum} = regexprep(fcontents{linenum},findre,replacere);
+            end
+        end
     end
-    fcontents = regexprep(fcontents,findre,replacere);
-
-    insideF = false;
-    for linenum = 1:length(fcontents)
-        if strfind(fcontents{linenum},'fcon.convec')
-            insideF = true;            
-        else strfind(fcontents{linenum},';')
-            insideF = false;
-        end        
-        if insideF
-            fcontents{linenum} = regexprep(fcontents{linenum},findre,replacere);
-        end                
-    end
-
     % write out the updated file
     fid = fopen([fname(1:end-2) '_art.m'],'w+');
     for i = 1:length(fcontents)
@@ -97,4 +126,5 @@ for s = 1:nSub
         end
     end
     fclose(fid);
+    disp(['Generated file: ' fname(1:end-2) '_art.m'])
 end
