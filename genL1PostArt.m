@@ -9,11 +9,11 @@ function genL1PostArt(base_dir,subjects,batchnames)
 
 nSub = length(subjects);
 for s = 1:nSub
-    fname = [base_dir '/' subjects{s} '/batch' batchnames{s}];
+    fname = [base_dir '/' subjects{s} '/batch/' batchnames{s}];
     fid = fopen(fname);
     % put each line of the original file into fcontents
     fcontents = {};
-    tline = fgetl(fid);    
+    tline = fgetl(fid);   
     while ischar(tline)
         fcontents{end+1} = tline;
         tline = fgetl(fid);
@@ -22,10 +22,12 @@ for s = 1:nSub
     
     fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
     
-    runstrs = regexp(foo,'sess{(\d)}','tokens')
+    runstrs = regexp(fcontents,'sess{(\d)}','tokens');
     nRuns = -1;
-    for i = 1:len(runstrs)
-        nRuns = max(nRuns,str2double(runstrs{i}{1}{1}));
+    for i = 1:length(runstrs)
+        if ~isempty(runstrs{i})
+            nRuns = max(nRuns,str2double(runstrs{i}{1}{1}));
+        end
     end
     
     % replace the regression coefficients
@@ -44,7 +46,7 @@ for s = 1:nSub
     consess_matches = regexp(fcontents,'tcon\.convec = ','split');
     consess_str = '';
     ind = 0;
-    while (len(consess_str) ~= 0)
+    while (length(consess_str) ~= 0)
         ind = ind+1;
         if length(consess_matches{ind})==2
             consess_str = conses_matches{ind}{2};
@@ -65,10 +67,9 @@ for s = 1:nSub
     
     % add in the zero paddings for f contrast
     %
-    
-    fid = fopen([fname(1:end-3) '_art.m']);
+    fid = fopen([fname(1:end-2) '_art.m'],'w+');
     for i = 1:length(fcontents)
-        fprintf(fid,fcontents{i});
+        fprintf(fid,[fcontents{i} '\n']);
     end
     fclose(fid);
 end
