@@ -72,7 +72,7 @@ disp('...complete!')
 
 %% Create the directory structure 
 
-dirnames = {'analysis','batch','preproc'};
+dirnames = {'analysis','batch','preproc','errors'};
 
 for d = 1:length(dirnames)
     
