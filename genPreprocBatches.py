@@ -1,5 +1,5 @@
 import argparse
-import glob,re,os.path
+import glob,re,os.path,datetime,os.system
 
 errorlog = ''
 
@@ -64,6 +64,8 @@ epiList = re.findall('.*run\d+-(\d+)',origtemplate)
 nPts = reduce(max,map(int,epiList))
 origPath = re.findall('(/.*)/preproc/',origtemplate)[0]
 
+generatedBatches = []
+
 for s in sublist:
     print "Processing subject: "+s
     destPath = spath+'/'+s
@@ -77,8 +79,19 @@ for s in sublist:
         break
     nextBatch = origtemplate
     nextBatch = nextBatch.replace(origPath,destPath)
+    generatedBatches.append(destPath+'/batch/'+finalname,'w')
     fout = open(destPath+'/batch/'+finalname,'w')
     fout.write(nextBatch)
     fout.close()
 
+for gb in generatedBatches:    
+    bsubcmd = "bsub -e " + spath "/errors_preproc"
+    bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_preproc" 
+    bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
+    bsubcmd = bsubcmd + " -q ncf"
+    bsubcmd = bsubcmd + ' matlab -nodisplay -r "runSPMBatch(' + gb + ')"'
+    os.system(bsubcmd)
+    
+
 print errorlog
+# append errorlog 
