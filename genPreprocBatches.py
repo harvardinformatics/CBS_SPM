@@ -92,7 +92,7 @@ if len(errorlog)>0:
     fe.close()
 
 for gb in generatedBatches:    
-    bsubcmd = "bsub -e " + spath "/errors_preproc"
+    bsubcmd = "bsub -e " + spath + "/errors_preproc"
     bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_preproc" 
     bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
     bsubcmd = bsubcmd + " -q ncf"
