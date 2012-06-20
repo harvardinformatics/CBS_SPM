@@ -7,7 +7,7 @@ errorlog = ''
 def rmSPM(spath,s):
     spmfiles = glob.glob(spath+'/'+s+'/analysis/SPM.mat')
     for fname in spmfiles:
-        print "Removing " + fname
+        print "\nRemoving " + fname + '\n'
         os.system('rm ' + fname)
 
 
@@ -31,7 +31,7 @@ def getNumPts(spath,s):
     nRuns = getNumRuns(spath,s)
     for i in range(1,nRuns+1):
         fruns = glob.glob(spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*')
-        print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
+        #print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
         nPts_i = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
         if nPts_i != nPts:
             errorlog = errorlog+"Subject " +s+ " has mismached numbers of points"
@@ -74,7 +74,7 @@ origPath = re.findall('(/.*)/preproc/',origtemplate)[0]
 
 generatedBatches = []
 for s in sublist:
-    print "Processing subject: "+s
+    print "\nProcessing subject: "+s+'\n'
     destPath = spath+'/'+s
     subRuns = getNumRuns(spath,s)
     subPts = getNumPts(spath,s)
@@ -129,8 +129,9 @@ for gb in generatedBatches:
     bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
     bsubcmd = bsubcmd + " -q ncf"
     bsubcmd = bsubcmd + ' matlab -nodisplay -r \"runSPMBatch(\'' + gb + '\')\"'
-    print "Running bsub as follows:"
+    print "\nRunning bsub as follows:\n"
     print bsubcmd
+    print '\n'
     os.system(bsubcmd)
     
 print errorlog
