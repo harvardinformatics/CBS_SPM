@@ -72,6 +72,7 @@ epiList = re.findall('.*run\d+-(\d+)',origtemplate)
 nPts = reduce(max,map(int,epiList))
 origPath = re.findall('(/.*)/preproc/',origtemplate)[0]
 
+generatedBatches = []
 for s in sublist:
     print "Processing subject: "+s
     destPath = spath+'/'+s
@@ -86,7 +87,6 @@ for s in sublist:
         break
     nextBatch = origtemplate
     nextBatch = nextBatch.replace(origPath,destPath)
-    generatedBatches = []
     # the pnames lines used to be up here. :-(
     for r in range(1,subRuns+1):
         # for each run, replace the onsets in the template with the actual onsets
