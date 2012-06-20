@@ -101,7 +101,7 @@ for subInd = 1:length(subjects)
         
         % and submit it!
         [filepath scriptname ext] = fileparts(runfile);
-        bsubcmd = ['bsub -e ' subjectDir '../error_ART_' dt];
+        bsubcmd = ['bsub -e ' base_dir '/errors_ART_' dt];
         bsubcmd = [bsubcmd ' -o ' subjectDir '/output_files/output_ART'];
         bsubcmd = [bsubcmd dt];
         bsubcmd = [bsubcmd ' -q ncf'];
