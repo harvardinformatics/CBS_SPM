@@ -94,7 +94,7 @@ for subInd = 1:length(subjects)
         fprintf(fid,'close(gcf);\n');
         fprintf(fid,'catch err\n');
         fprintf(fid,'m = err.message;\n');
-        fprintf(fid,['error([10 datestr(now) 10 ' 39 ' Batch could not be run: ' 39 ' 10 batchname 10 m 10]);\n']);
+        fprintf(fid,['error([10 datestr(now) 10 ' 39 ' Batch could not be run: ' 39 ' 10 mfilename(' 39 'fullpath' 39 ') 10 m 10]);\n']);
         fprintf(fid,'end\n');
         fclose(fid);
         disp([10 'Successfully created ' runfile 10])
