@@ -98,6 +98,7 @@ for gb in generatedBatches:
     bsubcmd = bsubcmd + " -q ncf"
     bsubcmd = bsubcmd + ' matlab -nodisplay -r \"runSPMBatch(\'' + gb + '\')\"'
     print "Running bsub as follows:"
+    print bsubcmd
     os.system(bsubcmd)
     
 print errorlog
