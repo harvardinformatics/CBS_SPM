@@ -92,13 +92,13 @@ if len(errorlog)>0:
     fe.close()
 
 for gb in generatedBatches:
-    bsubcmd = "bsub -e " + spath + errfile
+    bsubcmd = "bsub -e " + errfile
     bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_preproc" 
     bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
     bsubcmd = bsubcmd + " -q ncf"
     bsubcmd = bsubcmd + ' matlab -nodisplay -r \"runSPMBatch(\'' + gb + '\')\"'
+    print "Running bsub as follows:"
     os.system(bsubcmd)
     
 print errorlog
 # append errorlog 
-    
