@@ -117,7 +117,7 @@ if len(errorlog)>0:
 
 for gb in generatedBatches:
     bsubcmd = "bsub -e " + errfile
-    bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_preproc" 
+    bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_L1" 
     bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
     bsubcmd = bsubcmd + " -q ncf"
     bsubcmd = bsubcmd + ' matlab -nodisplay -r \"runSPMBatch(\'' + gb + '\')\"'
