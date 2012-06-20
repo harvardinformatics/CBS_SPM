@@ -104,4 +104,21 @@ for s in sublist:
     fout.write(nextBatch)
     fout.close()
 
+errfile = spath + "/errors_L1" + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
+if len(errorlog)>0:
+    fe = open(errfile,'w+')
+    for err in errorlog.split('\n'):
+        fe.write(err)
+    fe.close()
+
+for gb in generatedBatches:
+    bsubcmd = "bsub -e " + errfile
+    bsubcmd = bsubcmd + " -o " + os.path.dirname(gb) + "/../output_files/output_preproc" 
+    bsubcmd = bsubcmd + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
+    bsubcmd = bsubcmd + " -q ncf"
+    bsubcmd = bsubcmd + ' matlab -nodisplay -r \"runSPMBatch(\'' + gb + '\')\"'
+    print "Running bsub as follows:"
+    print bsubcmd
+    os.system(bsubcmd)
+    
 print errorlog
