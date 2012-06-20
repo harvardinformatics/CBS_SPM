@@ -95,11 +95,12 @@ for subInd = 1:length(subjects)
         disp([10 'Successfully created ' runfile 10])
         
         % and submit it!
+        [filepath scriptname ext] = fileparts(runfile);
         bsubcmd = ['bsub -e ' subjectDir '../error_ART_' dt];
         bsubcmd = [bsubcmd ' -o ' subjectDir '/output_files/output_ART'];
         bsubcmd = [bsubcmd dt];
         bsubcmd = [bsubcmd ' -q ncf'];
-        bsubcmd = [bsubcmd ' matlab -nodisplay -r ' runfile];
+        bsubcmd = [bsubcmd ' matlab -nodisplay -r ' 34 'cd ' filepath '; ' scriptname 34];
         system(bsubcmd);
 
     end
