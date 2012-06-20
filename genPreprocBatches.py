@@ -1,5 +1,5 @@
 import argparse
-import glob,re,os.path,datetime,os.system
+import glob,re,os.path,datetime,os
 
 errorlog = ''
 
