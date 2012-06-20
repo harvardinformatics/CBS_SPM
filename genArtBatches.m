@@ -76,7 +76,7 @@ for subInd = 1:length(subjects)
     % make the run file
     for n1=1:size(files,1)
         runfile=fullfile(artDir,['art_exec',num2str(n1,'%03d'),'.m']);
-        disp(['Creating runfile: ' runfile])
+        disp([10 'Creating runfile: ' runfile 10])
         [fid,msg]=fopen(runfile,'wt');
         if fid==-1
             error(['Problem creating art executable: ' msg])
@@ -91,7 +91,7 @@ for subInd = 1:length(subjects)
         % close the window after specified time
         fprintf(fid,'close(gcf);');
         fclose(fid);
-        disp(['Successfully created ' runfile ])
+        disp([10 'Successfully created ' runfile 10])
         
         % and submit it!
         bsubcmd = ['bsub -e ' subjectDir '/error_ART_' dt];
@@ -99,7 +99,7 @@ for subInd = 1:length(subjects)
         bsubcmd = [bsubcmd dt];
         bsubcmd = [bsubcmd ' -q ncf'];
         bsubcmd = [bsubcmd ' matlab -nodisplay -r ' runfile];
-        system(bsubcmd)
+        system(bsubcmd);
 
     end
     
