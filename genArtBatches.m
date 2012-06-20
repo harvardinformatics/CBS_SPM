@@ -23,6 +23,8 @@ use_diff_global=input_use_diff_global;
 use_diff_motion=input_use_diff_motion;
 use_norms=input_use_norms;
 
+dt = datestr(now,'yyyy_mm_dd_HHMM');
+
 for subInd = 1:length(subjects)
     subjectDir = [base_dir '/' subjects{subInd}];
     artDir = [subjectDir '/art_analysis'];
@@ -90,6 +92,15 @@ for subInd = 1:length(subjects)
         fprintf(fid,'close(gcf);');
         fclose(fid);
         disp(['Successfully created ' runfile ])
+        
+        % and submit it!
+        bsubcmd = ['bsub -e ' subjectDir '/error_ART_' dt];
+        bsubcmd = [bsubcmd ' -o ' subjectDir '/output_files/output_ART'];
+        bsubcmd = [bsubcmd dt];
+        bsubcmd = [bsubcmd ' -q ncf'];
+        bsubcmd = [bsubcmd ' matlab -nodisplay -r ' runfile];
+        system(bsubcmd)
+
     end
     
     
