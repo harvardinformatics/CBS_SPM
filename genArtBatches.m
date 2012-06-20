@@ -87,14 +87,14 @@ for subInd = 1:length(subjects)
         fprintf(fid,['cfgfile=''%s'';\n'],cfgfile);
         dispstr = ['''running subject ',num2str(n1),' using config file ',cfgfile,''''];
         fprintf(fid,['disp(%s)\n'],dispstr);
-        fprintf(fid,['addpath(' 39 '/ncf/snp/11/tools/art' 39 ');']);
-        artstr = ['art(''sess_file'',''' cfgfile ''',''stats_file'',''' save_filename ''');'];
+        fprintf(fid,['addpath(' 39 '/ncf/snp/11/tools/art' 39 ');\n']);
+        artstr = ['art(''sess_file'',''' cfgfile ''',''stats_file'',''' save_filename ''');\n'];
         fprintf(fid,'%s\n',artstr);
         % close the window after specified time
-        fprintf(fid,'close(gcf);');
+        fprintf(fid,'close(gcf);\n');
         fprintf(fid,'catch err\n');
-        fprintf(fid,'m = err.message;');
-        fprintf(fid,['error([10 datestr(now) 10 ' 39 ' Batch could not be run: ' 39 ' 10 batchname 10 m 10]']);
+        fprintf(fid,'m = err.message;\n');
+        fprintf(fid,['error([10 datestr(now) 10 ' 39 ' Batch could not be run: ' 39 ' 10 batchname 10 m 10]);\n']);
         fprintf(fid,'end\n');
         fclose(fid);
         disp([10 'Successfully created ' runfile 10])
