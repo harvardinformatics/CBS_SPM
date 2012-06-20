@@ -79,7 +79,7 @@ for s in sublist:
         break
     nextBatch = origtemplate
     nextBatch = nextBatch.replace(origPath,destPath)
-    generatedBatches.append(destPath+'/batch/'+finalname,'w')
+    generatedBatches.append(destPath+'/batch/'+finalname)
     fout = open(destPath+'/batch/'+finalname,'w')
     fout.write(nextBatch)
     fout.close()
