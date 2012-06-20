@@ -86,6 +86,7 @@ for subInd = 1:length(subjects)
         fprintf(fid,['cfgfile=''%s'';\n'],cfgfile);
         dispstr = ['''running subject ',num2str(n1),' using config file ',cfgfile,''''];
         fprintf(fid,['disp(%s)\n'],dispstr);
+        fprintf(fid,['addpath(' 39 '/ncf/snp/11/tools/art' 39 ');']);
         artstr = ['art(''sess_file'',''' cfgfile ''',''stats_file'',''' save_filename ''');'];
         fprintf(fid,'%s\n',artstr);
         % close the window after specified time
