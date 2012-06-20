@@ -23,7 +23,7 @@ def getNumPts(spath,s):
     nRuns = getNumRuns(spath,s)
     for i in range(1,nRuns+1):
         fruns = glob.glob(spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*')
-        print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
+        #print 'glob: '+spath+'/'+s+'/preproc/*run'+str.zfill(str(i),3)+'*'
         nPts_i = reduce(max,map(lambda x: int(re.search('run\d*-(\d+)',x).group(1)),fruns))
         if nPts_i != nPts:
             errorlog = errorlog+"Subject " +s+ " has mismached numbers of points"
