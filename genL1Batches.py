@@ -4,6 +4,13 @@ import datetime
 
 errorlog = ''
 
+def rmSPM(spath,s):
+    spmfiles = glob.glob(spath+'/'+s+'/analysis/SPM.mat')
+    for fname in spmfiles:
+        print "Removing " + fname
+        os.system('rm ' + fname)
+
+
 def getNumRuns(spath,s):
     fruns = glob.glob(spath+'/'+s+'/preproc/*run*')
     maxruns = 0    
@@ -70,6 +77,7 @@ for s in sublist:
     destPath = spath+'/'+s
     subRuns = getNumRuns(spath,s)
     subPts = getNumPts(spath,s)
+    rmSPM(spath,s)
     if subRuns != nOrigRuns:
         errorlog+="Subject "+ s +" has " + str(subRuns) + " runs, not " + str(nOrigRuns) + " runs.\n"
         break
