@@ -87,7 +87,7 @@ for s in sublist:
 errfile = spath + "/errors_preproc" + datetime.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
 if len(errorlog)>0:
     fe = open(errfile,'w+')
-    for err in errorlog.split():
+    for err in errorlog.split('\n'):
         fe.write(err)
     fe.close()
 
