@@ -1,5 +1,6 @@
 import argparse
 import glob,re,os.path
+import datetime
 
 errorlog = ''
 
@@ -77,8 +78,8 @@ for s in sublist:
         break
     nextBatch = origtemplate
     nextBatch = nextBatch.replace(origPath,destPath)
-    pNames = glob.glob(destPath+'/paradigms/run'+str.zfill(str(r),3)+'/*.txt')
-    pNames = map(lambda x: os.path.basename(x)[0:-4],pNames)
+    generatedBatches = []
+    # the pnames lines used to be up here. :-(
     for r in range(1,subRuns+1):
         # for each run, replace the onsets in the template with the actual onsets
         # there is no seek method here.  the issue is that we have to replace the first one,
@@ -87,6 +88,8 @@ for s in sublist:
         # only the second occurrence?
         #
         # solution: use split.  we'll keep the processed half and the unprocessed half separate
+    	pNames = glob.glob(destPath+'/paradigms/run'+str.zfill(str(r),3)+'/*.txt')
+	pNames = map(lambda x: os.path.basename(x)[0:-4],pNames)
         unprocBatch = nextBatch
         procBatch = ""
         for cond in pNames:
@@ -101,6 +104,7 @@ for s in sublist:
             unprocBatch = splitBatch[1]
         nextBatch = procBatch+unprocBatch
     fout = open(destPath+'/batch/'+finalname,'w')
+    generatedBatches.append(destPath+'/batch/'+finalname)
     fout.write(nextBatch)
     fout.close()
 
