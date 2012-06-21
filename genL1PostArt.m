@@ -16,6 +16,11 @@ dt = datestr(now,'yyyy_mm_dd_HHMM');
 nSub = length(subjects);
 for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
+    try
+        system(['rm ' subjectDir '/art_analysis/SPM.mat'])
+        disp(['Removed SPM.mat in art_analysis directory for ' subjects{s}]);
+    end
+    
     if length(batchnames)==1
         fname = [base_dir '/' subjects{s} '/batch/' batchnames{1}];
     else
@@ -43,6 +48,9 @@ for s = 1:nSub
         
     % replace the regression coefficients
     fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+    
+    % replace the analysis directory
+    fcontents = regexprep(fcontents,'matlabbatch{1}.spm.stats.fmri_spec.dir = {(.*)/analysis/','matlabbatch{1}.spm.stats.fmri_spec.dir = {$1/art_analysis/');
     
     % how many zeros will be added
     zeropad = zeros(1,nRuns);
