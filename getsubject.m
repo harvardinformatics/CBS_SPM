@@ -1,6 +1,6 @@
-function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath)
+function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,dicompath)
 %GETSUBJECT   Get subject data from the network and convert to spm. 
-%   GETSUBJECT(subjectid, boldruns, structrun,fmruns,destpath) downloads
+%   GETSUBJECT(subjectid, boldruns, structrun,fmruns,destpath[,dicompath]) downloads
 %   data using cbsget, processes it with spm and renames the files and
 %   puts them in an ordered directory structure.
 %
@@ -11,6 +11,8 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath)
 %               The fieldmap is optional. If you don't have one, put empty brackets, e.g. []
 %
 %   destpath:   the path where this data will go after conversion (in signle quotes, e.g. '/users/me/data')
+%   dicompath:  the path to dicoms, in the event that you don't want to run
+%               cbsget, but you do have the dicoms already unzipped in a folder.
 
 %% Do error checking on the inputs
 
@@ -30,45 +32,6 @@ end
 
 % Get current wd
 startingwd = pwd;
-
-%% Construct the call to cbs_get
-% An example call is:
-% cbsget -r 4,5,6,7 -s 120418_spmtest
-
-allruns = [boldruns structrun fmruns];
-
-runstr = '';
-for runnum = 1:length(allruns)
-    runstr = [runstr num2str(allruns(runnum)) ','];
-end
-
-% remove the last extraneous comma
-runstr = runstr(1:end-1);
-
-cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
-
-disp('Running cbsget as follows:')
-disp(cbscmd)
-
-[status,result] = system(cbscmd);
-
-if status~=0
-   error(['cbsget could not be run successfully!' 10 result])
-end
-
-%%  Unzip the files to the specified directory
-
-unzipcmd = ['unzip ' subjectid '.zip -d ' destpath];
-disp('Unzipping data as follows:')
-disp(unzipcmd)
-
-[status,result] = system(unzipcmd);
-
-if status~=0
-   error(['DICOM archive could not be unzipped successfully!' 10 result])
-end
-
-disp('...complete!')
 
 %% Create the directory structure 
 
@@ -96,6 +59,52 @@ disp(mkcmd)
 
 if status~=0
     error(['mkdir command could not be run successfully!' 10 result])
+end
+
+
+%% If we're not using cbs_get, copy the files
+if exist(dicompath)
+    disp('Not running cbsget: copying files instead')
+    system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
+else
+    %% Construct the call to cbs_get
+    % An example call is:
+    % cbsget -r 4,5,6,7 -s 120418_spmtest
+    
+    allruns = [boldruns structrun fmruns];
+    
+    runstr = '';
+    for runnum = 1:length(allruns)
+        runstr = [runstr num2str(allruns(runnum)) ','];
+    end
+    
+    % remove the last extraneous comma
+    runstr = runstr(1:end-1);
+    
+    cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
+    
+    disp('Running cbsget as follows:')
+    disp(cbscmd)
+    
+    [status,result] = system(cbscmd);
+    
+    if status~=0
+        error(['cbsget could not be run successfully!' 10 result])
+    end
+    
+    %%  Unzip the files to the specified directory
+    
+    unzipcmd = ['unzip ' subjectid '.zip -d ' destpath];
+    disp('Unzipping data as follows:')
+    disp(unzipcmd)
+    
+    [status,result] = system(unzipcmd);
+    
+    if status~=0
+        error(['DICOM archive could not be unzipped successfully!' 10 result])
+    end
+    
+    disp('...complete!')
 end
 
 %% Run spm convert on the files
