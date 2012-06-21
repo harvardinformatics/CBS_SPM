@@ -17,7 +17,7 @@ nSub = length(subjects);
 for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
     try
-        system(['rm ' subjectDir '/art_analysis/SPM.mat'])
+        [foo bar] = system(['rm ' subjectDir '/art_analysis/SPM.mat']);
         disp(['Removed SPM.mat in art_analysis directory for ' subjects{s}]);
     end
     
