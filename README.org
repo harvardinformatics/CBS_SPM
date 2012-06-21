@@ -9,24 +9,46 @@ This document describes the suite of scripts written to help you
 interact with ~cbsget~ and ~spm~.
 
 ** Prerequisites
+System requirements:
 All scripts require that you be on the cluster, and were tested using
-Matlab 2011a with spm version 8.4667.  (Use with older versions of matlab is unsupported, and is known
-to fail using Matlab 2007)
+Matlab 2012a with spm version 8.4667.  (Use with older versions of matlab is unsupported, and is known
+to fail using Matlab 2007).
+
+Directory structure:
+The scripts rely on the following directory structure which will automatically be created for you via the first script, getsubject.m.
+
+#+begin_example
+   |-mystudydir   
+   |---120418_mysubject
+   |-----RAW
+   |-------dicom files...
+   |-----analysis
+   |-------paradigms
+   |---------run001,run002,...
+   |-------spm files from first level analysis...
+   |-----batch
+   |-------spm batches...
+   |-----preproc
+   |-------converted dicoms, preprocessed data...
+#+end_example
+
 
 ** Summary
 
-The following scripts have been written
+The following scripts have been written and should be included in your default path if you are using the
+one listed on the FAQ site 
 
-| Script Name           | Location        | Details                                                     |
-|-----------------------+-----------------+-------------------------------------------------------------|
-| ~getsubject.m~        | ~/path/to/file~ | Pulls data using ~cbsget~ and creates a directory structure |
-| ~genPreprocBatch.py~  | ~/path/to/file~ | Generates preprocessing batches from template               |
-| ~still doesn't exist~ | klj             | iwoe                                                        |
-|                       |                 |                                                             |
+| Script Name           | Details                                                     |
+|-----------------------+-------------------------------------------------------------|
+| ~getsubject.m~        | Pulls data using ~cbsget~ and creates a directory structure |
+| ~genPreprocBatch.py~  | Generates preprocessing batches from template batch and executes batches |
+| ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
+| ~genArtBatches.m~     | Generates Art command and runs it  |
+| ~genL1PostArt.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
 * ~getsubject.m~
 
-~getsubject.m~ is a script that pulls data from the central
+~getsubject.m~ is a script that pulls data from the CBS
 repository, and creates a directory structure for it that will allow the use
 of the other scripts described here for gui free analysis of spm data. 
 ~getsubject~ may be called from within Matlab or from the command line.  It takes
