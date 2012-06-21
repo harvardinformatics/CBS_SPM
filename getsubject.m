@@ -262,7 +262,7 @@ for i = 1:length(myfiles)
 end
 
 
-if ~exist(dicompath)
+if ~exist('dicompath')
     disp('Removing zip file from CBS...')
     
     cd(startingwd)
