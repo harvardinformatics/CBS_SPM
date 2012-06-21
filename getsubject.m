@@ -33,38 +33,11 @@ end
 % Get current wd
 startingwd = pwd;
 
-%% Create the directory structure 
-
-dirnames = {'analysis','batch','preproc','output_files'};
-
-for d = 1:length(dirnames)
-    
-    mkcmd = ['mkdir ' destpath '/' subjectid '/' dirnames{d}];
-    
-    disp('Making new directory as follows:')
-    disp(mkcmd)
-    [status,result] = system(mkcmd);
-    
-    if status~=0
-        error(['mkdir command could not be run successfully!' 10 result])
-    end
-    
-end
-    
-mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
-
-disp('Making new directory as follows:')
-disp(mkcmd)
-[status,result] = system(mkcmd);
-
-if status~=0
-    error(['mkdir command could not be run successfully!' 10 result])
-end
-
-
 %% If we're not using cbs_get, copy the files
 if exist(dicompath)
     disp('Not running cbsget: copying files instead')
+    system(['mkdir ' fullfile(destpath,subjectid)])
+    system(['mkdir ' fullfile(destpath,subjectid,'RAW')])
     system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
 else
     %% Construct the call to cbs_get
@@ -106,6 +79,35 @@ else
     
     disp('...complete!')
 end
+
+%% Create the directory structure 
+
+dirnames = {'analysis','batch','preproc','output_files'};
+
+for d = 1:length(dirnames)
+    
+    mkcmd = ['mkdir ' destpath '/' subjectid '/' dirnames{d}];
+    
+    disp('Making new directory as follows:')
+    disp(mkcmd)
+    [status,result] = system(mkcmd);
+    
+    if status~=0
+        error(['mkdir command could not be run successfully!' 10 result])
+    end
+    
+end
+    
+mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
+
+disp('Making new directory as follows:')
+disp(mkcmd)
+[status,result] = system(mkcmd);
+
+if status~=0
+    error(['mkdir command could not be run successfully!' 10 result])
+end
+
 
 %% Run spm convert on the files
 
