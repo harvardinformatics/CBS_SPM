@@ -1,4 +1,4 @@
-function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,dicompath)
+function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,varargin)
 %GETSUBJECT   Get subject data from the network and convert to spm. 
 %   GETSUBJECT(subjectid, boldruns, structrun,fmruns,destpath[,dicompath]) downloads
 %   data using cbsget, processes it with spm and renames the files and
@@ -23,6 +23,10 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,dicompath)
 % subjectid = '120418_spmtest';
 % destpath = '/tmp';
 
+if nargin>5
+    dicompath = varargin{1};
+end
+
 % Has this been run before?
 dircontents = dir([destpath '/' subjectid]);
 
@@ -34,7 +38,7 @@ end
 startingwd = pwd;
 
 %% If we're not using cbs_get, copy the files
-if exist(dicompath)
+if exist('dicompath')
     disp('Not running cbsget: copying files instead')
     [status result] = system(['mkdir ' fullfile(destpath,subjectid)]);
     if status~=0
@@ -49,7 +53,7 @@ if exist(dicompath)
     disp(cpcmd);
     [status result] = system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
     if status~=0
-        error(['cbsget could not be run successfully!' 10 result])
+        error(['getsubject could not be run successfully!' 10 result])
     end
 else
     %% Construct the call to cbs_get
