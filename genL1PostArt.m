@@ -127,4 +127,14 @@ for s = 1:nSub
     end
     fclose(fid);
     disp(['Generated file: ' fname(1:end-2) '_art.m'])
+    
+    % and submit it!
+    [filepath scriptname ext] = fileparts([fname(1:end-2) '_art.m']);
+    bsubcmd = ['bsub -e ' base_dir '/errors_L1ART_' dt];
+    bsubcmd = [bsubcmd ' -o ' subjectDir '/output_files/output_L1ART'];
+    bsubcmd = [bsubcmd dt];
+    bsubcmd = [bsubcmd ' -q ncf'];
+    bsubcmd = [bsubcmd ' matlab -nodisplay -r ' 34 'runSPMBatch(' filepath scriptname ext ');' 34];
+    system(bsubcmd);   
+    
 end
