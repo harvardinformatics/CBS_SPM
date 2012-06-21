@@ -15,6 +15,7 @@ dt = datestr(now,'yyyy_mm_dd_HHMM');
     
 nSub = length(subjects);
 for s = 1:nSub
+    subjectDir = [base_dir '/' subjects{s}];
     if length(batchnames)==1
         fname = [base_dir '/' subjects{s} '/batch/' batchnames{1}];
     else
