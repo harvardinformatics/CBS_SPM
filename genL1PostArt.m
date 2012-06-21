@@ -145,7 +145,7 @@ for s = 1:nSub
     bsubcmd = [bsubcmd ' -o ' subjectDir '/output_files/output_L1ART'];
     bsubcmd = [bsubcmd dt];
     bsubcmd = [bsubcmd ' -q ncf'];
-    bsubcmd = [bsubcmd ' matlab -nodisplay -r ' 34 'runSPMBatch(' 39 filepath scriptname ext 39 ');' 34];
+    bsubcmd = [bsubcmd ' matlab -nodisplay -r ' 34 'runSPMBatch(' 39 filepath filesep scriptname ext 39 ');' 34];
     system(bsubcmd);   
     
 end
