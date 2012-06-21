@@ -36,9 +36,21 @@ startingwd = pwd;
 %% If we're not using cbs_get, copy the files
 if exist(dicompath)
     disp('Not running cbsget: copying files instead')
-    system(['mkdir ' fullfile(destpath,subjectid)])
-    system(['mkdir ' fullfile(destpath,subjectid,'RAW')])
-    system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
+    [status result] = system(['mkdir ' fullfile(destpath,subjectid)]);
+    if status==0
+        error(['cbsget could not be run successfully!' 10 result])
+    end
+    [status result] = system(['mkdir ' fullfile(destpath,subjectid,'RAW')]);
+    if status==0
+        error(['cbsget could not be run successfully!' 10 result])
+    end
+    disp('Copying files as follows:')
+    cpcmd = ['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')];
+    disp(cpcmd);
+    [status result] = system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
+    if status==0
+        error(['cbsget could not be run successfully!' 10 result])
+    end
 else
     %% Construct the call to cbs_get
     % An example call is:
