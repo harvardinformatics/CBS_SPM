@@ -235,37 +235,45 @@ cd(thisdir)
 
 disp('Removing uncompressed files...')
 
-rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.gif'];
+myfiles = dir([destpath '/' subjectid '/RAW/']);
 
-[status,result] = system(rmcmd);
+tgzname = [subjectid '.tar.gz'];
 
-if status~=0
-   warning(['.gif files could not removed!' 10 result])
-end
+for i = 1:length(myfiles)    
+    if strcmp(myfiles(i).name,tgzname)
+        % do nothing
+    elseif strcmp(myfiles(i).name,'.')
+        % do nothing
+    elseif strcmp(myfiles(i).name,'..')
+        % do nothing
+    else
+        rmcmd = ['rm ' destpath '/' subjectid '/RAW/' myfiles(i).name];
 
-rmcmd = ['rm ' destpath '/' subjectid '/RAW/*.dcm'];
+        [status,result] = system(rmcmd);
 
-[status,result] = system(rmcmd);
-
-if status~=0
-   error(['DICOM files could not be removed!' 10 result])
-end
-
-disp('Removing zip file from CBS...')
-
-cd(startingwd)
-
-rmcmd = ['rm ' subjectid '.zip'];
-
-[status,result] = system(rmcmd);
-
-if status~=0
-   error(['Original zip file could not be removed!' 10 result])
+        if status~=0
+           warning(['File could not removed!' 10 result])
+        end
+    end
 end
 
 
-disp('...Complete!')
-
+if ~exist(dicompath)
+    disp('Removing zip file from CBS...')
+    
+    cd(startingwd)
+    
+    rmcmd = ['rm ' subjectid '.zip'];
+    
+    [status,result] = system(rmcmd);
+    
+    if status~=0
+        error(['Original zip file could not be removed!' 10 result])
+    end
+    
+    
+    disp('...Complete!')
+end
 
 disp('********************************************************')
 disp('*                    Thank You!                        *')
