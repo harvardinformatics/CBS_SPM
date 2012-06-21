@@ -50,7 +50,7 @@ for s = 1:nSub
     fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
     
     % replace the analysis directory
-    fcontents = regexprep(fcontents,'matlabbatch{1}.spm.stats.fmri_spec.dir = {(.*)/analysis/','matlabbatch{1}.spm.stats.fmri_spec.dir = {$1/art_analysis/');
+    fcontents = regexprep(fcontents,'matlabbatch\{1\}\.spm\.stats\.fmri_spec\.dir = \{(.*)/analysis','matlabbatch{1}.spm.stats.fmri_spec.dir = {$1/art_analysis/');
     
     % how many zeros will be added
     zeropad = zeros(1,nRuns);
