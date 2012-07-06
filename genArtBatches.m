@@ -25,6 +25,18 @@ use_norms=input_use_norms;
 
 dt = datestr(now,'yyyy_mm_dd_HHMM');
 
+if ~iscell(subjects)
+    subfile = subjects;
+    fid = fopen(subfile,'r');
+    subjects = {};
+    while 1
+        tline = fgetl(fid);
+        if ~ischar(tline), break, end
+        subjects{end+1} = tline;
+    end
+    fclose(fid);
+end
+    
 for subInd = 1:length(subjects)
     subjectDir = [base_dir '/' subjects{subInd}];
     artDir = [subjectDir '/art_analysis'];

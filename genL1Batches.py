@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+
+import platform
+pstr = platform.python_version()
+if pstr[0]!="2":
+    print "This script is designed for Python 2.  Other versions may cause errors!"
+elif int(pstr[2])<7:
+    print '''This script has been tested in version 2.7 of python.  You are using an earlier version!  Please use the default environment as specified on the CBS FAQ page:
+http://cbs.fas.harvard.edu/science/core-facilities/neuroimaging/information-investigators/faq
+'''
+
 import argparse
 import glob,re,os.path
 import datetime
@@ -63,8 +74,11 @@ if args["subjects"]:
     sublist = args["subjects"]
 elif args["subjectfile"]:
     fsf = open(args["subjectfile"],'r')
-    sublist = fsf.split('\n')
+    sublist = []
+    for l in fsf:        
+        sublist.append(l.strip())
     fsf.close()
+
     
 runList = re.findall('.*run(\d+)',origtemplate)
 nOrigRuns = reduce(max,map(int,runList))
