@@ -28,6 +28,9 @@ dt = datestr(now,'yyyy_mm_dd_HHMM');
 if ~iscell(subjects)
     subfile = subjects;
     fid = fopen(subfile,'r');
+    if fid==-1
+        error(['Subject list file does not exist:\n' subfile])
+    end
     subjects = {};
     while 1
         tline = fgetl(fid);
