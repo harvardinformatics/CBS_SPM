@@ -28,9 +28,7 @@ def getNumPts(spath,s):
         if nPts_i != nPts:
             errorlog = errorlog+"Subject " +s+ " has mismached numbers of points"
             return None
-    return nPts
-            
-        
+    return nPts        
     
 parser = argparse.ArgumentParser(description='Generate new SPM batch files from a template.')
 parser.add_argument('-t','--template', help='Template batch file', required=True)
@@ -38,6 +36,16 @@ parser.add_argument('-p','--path', help='Path to subjects', required=True, nargs
 parser.add_argument('-s','--subjects', help='List of subjects', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='File containing subjects', required=False)
 args = vars(parser.parse_args())
+
+if args["subjects"]:
+    sublist = args["subjects"]
+elif args["subjectfile"]:
+    fsf = open(args["subjectfile"],'r')
+    sublist = []
+    for l in fsf:        
+        sublist.append(l.strip())
+    fsf.close()
+    print sublist
 
 f = open(args["template"])
 origtemplate = f.read()
@@ -50,13 +58,6 @@ spath = args["path"][0]
 # remove a trailing slash if it's there
 if spath[-1]=='/':
     spath = spath[0:-1]
-
-if args["subjects"]:
-    sublist = args["subjects"]
-elif args["subjectfile"]:
-    fsf = open(args["subjectfile"],'r')
-    sublist = fsf.split('\n')
-    fsf.close()
     
 runList = re.findall('.*run(\d+)',origtemplate)
 nOrigRuns = reduce(max,map(int,runList))
