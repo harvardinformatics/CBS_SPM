@@ -2,8 +2,10 @@
 % CBS SPM preprocessing batch package -- Template Overwrite Script
 % Created by Caitlin Carey
 %
-% function genL1PostArt(base_dir,subjects,batchnames)
-% 
+% function genL1PostArt(base_dir,subjects,batchname)
+%
+% Example call:
+% genL1PostArt('/ncf/snp/06/SPAA/CBS/MID_analysis_art',{'subject1','subject2','subject3'},{'myLevel1Batch.m'})
 %--------------------------------------------------------------------------
 function genL1PostArt(base_dir,subjects,batchnames)
 
@@ -12,7 +14,22 @@ if ~iscell(batchnames)
 end
 
 dt = datestr(now,'yyyy_mm_dd_HHMM');    
-    
+
+if ~iscell(subjects)
+    subfile = subjects;
+    fid = fopen(subfile,'r');
+    if fid==-1
+        error(['Subject list file does not exist:' 10 subfile])
+    end
+    subjects = {};
+    while 1
+        tline = fgetl(fid);
+        if ~ischar(tline), break, end
+        subjects{end+1} = tline;
+    end
+    fclose(fid);
+end
+
 nSub = length(subjects);
 for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
