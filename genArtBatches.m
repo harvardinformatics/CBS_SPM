@@ -29,7 +29,7 @@ if ~iscell(subjects)
     subfile = subjects;
     fid = fopen(subfile,'r');
     if fid==-1
-        error(['Subject list file does not exist:\n' subfile])
+        error(['Subject list file does not exist:' 10 subfile])
     end
     subjects = {};
     while 1
