@@ -2,19 +2,17 @@
 #+AUTHOR: Caitlin Carey, Stephanie McMains, Alex Storer
 #+EMAIL: smcmains@fas.harvard.edu
 #+DATE: May, 2012
-#+search org mode blah for help)
+
 
 * Goals
 This document describes the suite of scripts written to help you
-run SPM batches created for a signle subject on all subjects.
-Instead of the GIU, these scripts run via the command line and use bsub
-to run all subjects quickly.
+interact with ~cbsget~ and ~spm~.
 
 ** Prerequisites
 System requirements:
 All scripts require that you be on the cluster, and were tested using
-Matlab 2011b, spm version 8.4667, python 2.7.3.  (Use with older versions of matlab is unsupported, and is known
-to fail using Matlab 2007). To access the scripts, you should be using the CBS defaut enviornment (http://cbs.fas.harvard.edu/science/core-facilities/neuroimaging/information-investigators/faq). To set your spm and matlab versions (which you will need to do), follow the appropriate FAQs.
+Matlab 2012a with spm version 8.4667.  (Use with older versions of matlab is unsupported, and is known
+to fail using Matlab 2007).
 
 Directory structure:
 The scripts rely on the following directory structure which will automatically be created for you via the first script, getsubject.m.
@@ -23,38 +21,36 @@ The scripts rely on the following directory structure which will automatically b
    |-mystudydir   
    |---120418_mysubject
    |-----RAW
-   |-------/dicom files.../
+   |-------dicom files...
    |-----analysis
    |-------paradigms
-   |---------/run001,run002,.../
-   |-------/spm files from first level analysis.../
+   |---------run001,run002,...
+   |-------spm files from first level analysis...
    |-----batch
-   |-------/spm batches.../
+   |-------spm batches...
    |-----preproc
-   |-------/converted dicoms, preprocessed data.../
-   |-----output
-   |-------/log_files with matlab output/	
+   |-------converted dicoms, preprocessed data...
 #+end_example
 
 
 ** Summary
 
 The following scripts have been written and should be included in your default path if you are using the
-one listed on the FAQ site. 
+one listed on the FAQ site 
 
 | Script Name           | Details                                                     |
 |-----------------------+-------------------------------------------------------------|
-| ~getsubject.m~        | Pulls data using ~cbsget~ and creates a directory structure |
+| ~getSubjectSPM~        | Pulls data using ~cbsget~ and creates a directory structure |
 | ~genPreprocBatch.py~  | Generates preprocessing batches from template batch and executes batches |
 | ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
-| ~genArtBatches.m~     | Generates Art command and runs it  |
-| ~genL1PostArt.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
+| ~genArtFiles.m~     | Generates Art command and runs it  |
+| ~genL1ArtBatches.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
-* getsubject.m
+* ~getsubject.m~
 
 ~getsubject.m~ is a script that pulls data from the CBS
-repository, converts it to SPM img format, and creates a directory structure for it that will allow the use
-of the other scripts described here. 
+repository, and creates a directory structure for it that will allow the use
+of the other scripts described here for gui free analysis of spm data. 
 ~getsubject~ may be called from within Matlab or from the command line.  It takes
 the following inputs:
 
@@ -70,29 +66,32 @@ the following inputs:
 |-------------+-------------------------------------------------------------|
 | ~fmruns~    | a vector of the field-mapping runs. If no fieldmap, use []  |
 |-------------+-------------------------------------------------------------|
-| ~destpath~  | the full path to the location to place the output                |
+| ~destpath~  | the path to the location to place the output                |
 |-------------+-------------------------------------------------------------|
 
 For example:
 #+begin_example
-getsubject('120418_spmtest',[5],[4],[6 7],'/ncf/myspace/mystudydir')
+getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
 #+end_example
 
 This creates the following directory tree:
-#+begin_example
-   |-mystudydir   
+
+   |-tmp   
    |---120418_spmtest
    |-----RAW
    |-----analysis
    |-------paradigms
+   |---------run001,run002,...
    |-----batch
    |-----preproc
-   |-----output
+#+begin_example
+temp
 #+end_example
 
-Within the RAW directory is a tarball (subjectname.tar.gz)
-containing the DICOMs in a compressed format. 
-The SPM converted data is in the preproc directory.
+Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
+containing the DICOMs in a compressed format.  ~spm~ has also been
+used to convert the files from ~.dcm~ format to ~.img~ and ~.hdr~
+formats in the ~preproc~ directory.
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
@@ -115,9 +114,7 @@ For first level analysis, each condition should have it's own onset .txt file,
 with each row being a single onset time.  The name of the file should be the name
 given to each condition within the SPM batch, followed by the .txt extension.
 
-* genPreprocBatch.py
-
-Must use full pathnames
+* ~genPreprocBatch.py~
 
 The goal of this script is to eliminate the need for the repeated use of the SPM GUI.
 Using the GUI once, it is possible to create a template batch file, then use
@@ -147,8 +144,6 @@ python genPreprocBatch.py -t /ncf/labspace/subject_dir/subject1/batch/preproc_jo
 #+end_example
 
 
-
-genL1Batches -> can take one batch name, or many as a list
 * Acknowledgments
 These scripts were written by Alex Storer, Caitlin Carey and Stephanie
 McMains with additional assistance from David Dodell-Feder.
