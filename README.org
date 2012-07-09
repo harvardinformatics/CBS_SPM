@@ -40,11 +40,11 @@ one listed on the FAQ site
 
 | Script Name           | Details                                                     |
 |-----------------------+-------------------------------------------------------------|
-| ~getsubject.m~        | Pulls data using ~cbsget~ and creates a directory structure |
+| ~getSubjectSPM~        | Pulls data using ~cbsget~ and creates a directory structure |
 | ~genPreprocBatch.py~  | Generates preprocessing batches from template batch and executes batches |
 | ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
-| ~genArtBatches.m~     | Generates Art command and runs it  |
-| ~genL1PostArt.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
+| ~genArtFiles.m~     | Generates Art command and runs it  |
+| ~genL1ArtBatches.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
 * ~getsubject.m~
 
@@ -75,7 +75,7 @@ getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
 #+end_example
 
 This creates the following directory tree:
-#+begin_example
+
    |-tmp   
    |---120418_spmtest
    |-----RAW
@@ -84,6 +84,8 @@ This creates the following directory tree:
    |---------run001,run002,...
    |-----batch
    |-----preproc
+#+begin_example
+temp
 #+end_example
 
 Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
