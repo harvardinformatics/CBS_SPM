@@ -53,8 +53,8 @@ one listed on the FAQ site.
 * getsubject.m
 
 ~getsubject.m~ is a script that pulls data from the CBS
-repository, and creates a directory structure for it that will allow the use
-of the other scripts described here for gui free analysis of spm data. 
+repository, converts it to SPM img format, and creates a directory structure for it that will allow the use
+of the other scripts described here. 
 ~getsubject~ may be called from within Matlab or from the command line.  It takes
 the following inputs:
 
@@ -90,10 +90,9 @@ This creates the following directory tree:
    |-----output
 #+end_example
 
-Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
-containing the DICOMs in a compressed format.  ~spm~ has also been
-used to convert the files from ~.dcm~ format to ~.img~ and ~.hdr~
-formats in the ~preproc~ directory.
+Within the RAW directory is a tarball (subjectname.tar.gz)
+containing the DICOMs in a compressed format. 
+The SPM converted data is in the preproc directory.
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
