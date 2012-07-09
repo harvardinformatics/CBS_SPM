@@ -21,7 +21,7 @@ args = vars(parser.parse_args())
 #             cbsget, but you do have the dicoms already unzipped in a folder.
 
 # getsubject(subjectid,boldruns,structrun,fmruns,destpath,varargin)
-runcmd = 'matlab -nodisplay -r "try \ngetsubject('
+runcmd = 'matlab -nodisplay -r "try \\ngetsubject('
 runcmd += "\'"+args["subjectid"][0]+"\'"
 runcmd += ','
 runcmd += '['+''.join([b+',' for b in args["boldruns"]])[0:-1]+']'
@@ -36,10 +36,10 @@ runcmd += ','
 runcmd += "\'"+args["destpath"][0]+"\'"
 if args["dicompath"]:
     runcmd += ",\'"+args["dicompath"][0]+"\'"
-runcmd += ')"'
-runcmd += '\ncatch\n'
-runcmd += "exit()\n"
-runcmd += "end"
+runcmd += ')'
+runcmd += '\\ncatch\\n'
+runcmd += "exit()\\n"
+runcmd += "end""
 
 
 print runcmd
