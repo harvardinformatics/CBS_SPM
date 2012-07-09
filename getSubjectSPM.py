@@ -39,7 +39,7 @@ if args["dicompath"]:
 runcmd += ')'
 runcmd += '\\ncatch\\n'
 runcmd += "exit()\\n"
-runcmd += "end""
+runcmd += "end\""
 
 
 print runcmd
