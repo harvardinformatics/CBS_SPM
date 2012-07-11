@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+import os
 
 parser = argparse.ArgumentParser(description='Download a single SPM subject and set up the correct directory structure.')
 parser.add_argument('-p','--destpath', help='the path where this data will go after conversion (e.g. /users/me/data)', required=True, nargs=1)
@@ -41,4 +42,4 @@ runcmd += '; catch ME; disp(ME.message);'
 runcmd += "end; exit()\""
 
 
-print runcmd
+os.system(runcmd)
