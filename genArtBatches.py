@@ -4,12 +4,13 @@ import os
 
 parser = argparse.ArgumentParser(description='Download a single SPM subject and set up the correct directory structure.')
 parser.add_argument('-b','--basedir', help='the path containing the subject directories (e.g. /users/me/data)', required=True, nargs=1)
-parser.add_argument('-gt','--globalthreshold', help='Threshold for outlier based on global signal (actual value or std)', required=True, nargs=1)
-
-parser.add_argument('-mt','--motionthreshold', help='Include for use_diff_global', required=True, nargs=1)
 
 parser.add_argument('-s','--subjectid', help='the name of the subject(s)', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='the name of the file containing subject(s)', required=False, nargs=1)
+
+parser.add_argument('-gt','--globalthreshold', help='Threshold for outlier based on global signal (actual value or std)', required=True, nargs=1)
+
+parser.add_argument('-mt','--motionthreshold', help='Include for use_diff_global', required=True, nargs=1)
 
 parser.add_argument('-g','--diffglobal', help='Include for use_diff_global', required=False)
 
@@ -25,7 +26,6 @@ if args["subjectfile"]:
     substr = "\'"+args["subjectfile"][0]+"\'"
 elif args["subjectid"]:
     substr = "{\'"+"\',\'".join(args["subjectid"])+"\'}"
-    print substr
 else:
     raise Exception("Must specify either a subject file (-f) or subjectid (-s)")
     
