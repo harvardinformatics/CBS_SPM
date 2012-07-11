@@ -152,6 +152,9 @@ for b = 1:length(boldruns)
     end
     
     bruns = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
+    if (length(bruns)<1)
+        error(['No dicoms found for run ' runstr ' - did SPM provide warning messages?'])
+    end
     for br = 1:length(bruns)
         brname = bruns(br).name;
         parsed = regexp(brname,'-','split');
