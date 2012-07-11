@@ -27,4 +27,5 @@ runcmd += ')'
 runcmd += '; catch ME; disp(ME.message);'
 runcmd += "end; exit()\""
 
+print runcmd
 os.system(runcmd)
