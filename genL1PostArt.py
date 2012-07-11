@@ -8,7 +8,7 @@ parser.add_argument('-b','--basedir', help='the path containing the subject dire
 parser.add_argument('-s','--subjectid', help='the name of the subject(s)', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='the name of the file containing subject(s)', required=False, nargs=1)
 
-parser.add_argument('-n','--batchname', help='The full path to the batchfile, e.g., /usr/me/myLevel1Batch.m', required=True, nargs=1)
+parser.add_argument('-n','--batchname', help='The name of the batchfile, e.g., myLevel1Batch.m', required=True, nargs=1)
 
 args = vars(parser.parse_args())
 
