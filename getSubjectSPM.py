@@ -37,9 +37,8 @@ runcmd += "\'"+args["destpath"][0]+"\'"
 if args["dicompath"]:
     runcmd += ",\'"+args["dicompath"][0]+"\'"
 runcmd += ')'
-runcmd += '; catch;'
-runcmd += "exit();"
-runcmd += "end\""
+runcmd += '; catch ME; disp(ME.message);'
+runcmd += "end; exit()\""
 
 
 print runcmd
