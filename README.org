@@ -30,7 +30,7 @@ The scripts relys on the following directory structure which will automatically 
    |-mystudydir   
    |---120418_mysubject
    |-----RAW
-   /|-------dicom files.../
+   |/-------dicom files.../
    |-----analysis
    |-------paradigms
    |---------run001,run002,...
