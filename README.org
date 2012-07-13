@@ -2,34 +2,48 @@
 #+AUTHOR: Caitlin Carey, Stephanie McMains, Alex Storer
 #+EMAIL: smcmains@fas.harvard.edu
 #+DATE: May, 2012
+#+ search mode org blah
 
 
 * Goals
-This document describes the suite of scripts written to help you
-interact with ~cbsget~ and ~spm~.
+This document describes the suite of scripts written to take
+a SPM batch file created for one subject and generate identical batch
+files for many subjects.  These batch files are then submitted to the
+cluster via bsub, eliminating the need for the GUI, and speeding up the
+process of analyzing (or reanalyzing) many subjects at once. In order to use
+the scripts, create your desired batch (preproc, or level1) and use the
+'save as script' option when saving the batch.  This creates a file called
+batchname_job.m, which will serve as your template for the scripts below.
 
 ** Prerequisites
 System requirements:
 All scripts require that you be on the cluster, and were tested using
-Matlab 2012a with spm version 8.4667.  (Use with older versions of matlab is unsupported, and is known
-to fail using Matlab 2007).
+Matlab 2012a with spm version 8.4667, and python version 2.7.3.  
+Use with older versions of matlab is unsupported, and is known
+to fail using Matlab 2007. In order to access the scripts, you should be using
+the default environment as specified on the FAQ site (
 
 Directory structure:
-The scripts rely on the following directory structure which will automatically be created for you via the first script, getsubject.m.
+The scripts relys on the following directory structure which will automatically be created for you via the first script, getsubject.m.
 
-#+begin_example
+
    |-mystudydir   
    |---120418_mysubject
    |-----RAW
-   |-------dicom files...
+   |-------/dicom files.../
    |-----analysis
    |-------paradigms
    |---------run001,run002,...
-   |-------spm files from first level analysis...
+   |-----------/cond1.txt, cond2.txt.../
+   |-------/spm files from first level analysis.../
    |-----batch
-   |-------spm batches...
+   |-------/spm batches.../
    |-----preproc
-   |-------converted dicoms, preprocessed data...
+   |-------/converted dicoms, preprocessed data.../
+   |-----output_files
+   |-------/files containing error messages from scripts/
+
+#+begin_example
 #+end_example
 
 
@@ -40,43 +54,48 @@ one listed on the FAQ site
 
 | Script Name           | Details                                                     |
 |-----------------------+-------------------------------------------------------------|
-| ~getSubjectSPM~        | Pulls data using ~cbsget~ and creates a directory structure |
-| ~genPreprocBatch.py~  | Generates preprocessing batches from template batch and executes batches |
+| ~getSubjectSPM.py~        | Pulls data using ~cbsget~ and creates a directory structure |
+| ~genPreprocBatches.py~  | Generates preprocessing batches from template batch and executes batches |
 | ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
-| ~genArtFiles.m~     | Generates Art command and runs it  |
-| ~genL1ArtBatches.m~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
+| ~genArtFiles.py~     | Generates Art command and runs it  |
+| ~genL1ArtBatches.py~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
-* ~getsubject.m~
+* ~getsubject.py~
 
-~getsubject.m~ is a script that pulls data from the CBS
-repository, and creates a directory structure for it that will allow the use
-of the other scripts described here for gui free analysis of spm data. 
-~getsubject~ may be called from within Matlab or from the command line.  It takes
-the following inputs:
+~getsubject.py~ is a script that pulls data from the CBS
+repository (or a directory), converts it to SPM format (img), and creates a directory structure for 
+it that will allow the use of the other scripts described here for gui free analysis of spm data. 
 
-~GETSUBJECT(subjectid, boldruns, structrun, fmruns, destpath)~
-|-------------+-------------------------------------------------------------|
-| Input       | Description                                                 |
-|-------------+-------------------------------------------------------------|
-| ~subjectid~ | the name of the subject, as as string  in quotes            |
-|-------------+-------------------------------------------------------------|
-| ~boldruns~  | a vector of the BOLD runs, seperated by a space             |
-|-------------+-------------------------------------------------------------|
-| ~structrun~ | a vector of the single struct-run                           |
-|-------------+-------------------------------------------------------------|
-| ~fmruns~    | a vector of the field-mapping runs. If no fieldmap, use []  |
-|-------------+-------------------------------------------------------------|
-| ~destpath~  | the path to the location to place the output                |
-|-------------+-------------------------------------------------------------|
+It takes the following inputs in any order.  For help, type -h:
+
+getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
+
+|--------+-------------+-------------------------------------------------------------|
+|Flag    | Stands for  | Description                                                 |
+|--------+-------------+-------------------------------------------------------------|
+| -h     | help        | shows usage message and exits                      |
+|--------+-------------+-------------------------------------------------------------|
+| -s     | subjectid   | the name of the subject           |
+|--------+-------------+-------------------------------------------------------------|
+| -b     | boldruns    | a list of run numbers for the BOLD scans, seperated by spaces |
+|--------+-------------+-------------------------------------------------------------|
+| -t     | structrun   | the run number for the structural scan                        |
+|--------+-------------+-------------------------------------------------------------|
+| -m     | fieldmap runs     | the run numbers for the fieldmap, if present needs two runs   |
+|--------+-------------+-------------------------------------------------------------|
+| -p     | destination path    | the FULL path to the location to place the output, no relative path (i.e. no ../ or ~)|
+|--------+-------------+-------------------------------------------------------------|
+| -d     | dicom path  | the path to a single directory containing all of the unzipped dicoms (as opposed to using CBSCentral|
+|--------+-------------+-------------------------------------------------------------|
 
 For example:
 #+begin_example
-getsubject('120418_spmtest',[5],[4],[6 7],'/tmp')
+getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/
 #+end_example
 
 This creates the following directory tree:
 
-   |-tmp   
+   |-myexp   
    |---120418_spmtest
    |-----RAW
    |-----analysis
@@ -84,14 +103,11 @@ This creates the following directory tree:
    |---------run001,run002,...
    |-----batch
    |-----preproc
-#+begin_example
-temp
-#+end_example
+   |-----output_files
 
-Within the ~RAW~ directory is a tarball (~[subjectname].tar.gz~)
-containing the DICOMs in a compressed format.  ~spm~ has also been
-used to convert the files from ~.dcm~ format to ~.img~ and ~.hdr~
-formats in the ~preproc~ directory.
+Within the ~RAW~ directory is a tarball (/[subjectname].tar.gz/)
+containing the DICOMs in a compressed format.  In the ~preproc~ directory
+will be the SPM converted files /.img and .hdr/. 
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
@@ -100,49 +116,57 @@ renamed as follows:
 |-------------------------+---------------------------------------------|
 | File name               | Description                                 |
 |-------------------------+---------------------------------------------|
-| ~f-run001-006.img~      | Image 6 of the first BOLD run               |
+| f-run001-006.img        | Image 6 of the first BOLD run               |
 |-------------------------+---------------------------------------------|
-| ~s-struct.img~          | The structural image for the subject        |
+| s-struct.img            | The structural image for the subject        |
 |-------------------------+---------------------------------------------|
-| ~s-fieldmap-mag-01.img~ | The magnitude of the fieldmap (if provided) |
+| s-fieldmap-mag-01.img   | The magnitude of the fieldmap (if provided) |
 |-------------------------+---------------------------------------------|
-| ~s-fieldmap_phase.img~  | The phase of the fieldmap                   |
+| s-fieldmap_phase.img    | The phase of the fieldmap                   |
 |-------------------------+---------------------------------------------|
+
+
+* ~genPreprocBatch.py~
+
+The goal of this script is to take a batch file created to perform preprocessing
+on a single subject and use it to analyze many subjects.  This is done by saving
+your batch via the 'save as script' command in SPM. This creates a 
+batchname_job.m file, which will serve as your template batch. This batch will be
+applied to all of the subjects provided, which can include the original subject 
+that was used to create the template.
+
+
+genPreprocBatches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...
+or
+genPreprocBatches -t TEMPLATE -p PATH -f SUBJECTFILE
+|--------+-------------+-------------------------------------------------------------|
+|Flag    | Stands for  | Description                                                 |
+|--------+-------------+-------------------------------------------------------------|
+| -h     | help        | provides usage message and then exits                       |
+|--------+-------------+-------------------------------------------------------------|
+| -t     | template batch |the full path to, and name of the template batch created in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+|--------+-------------+-------------------------------------------------------------|
+| -p     | path        | the path to the directory that contains all of your subjects            |
+|--------+-------------+-------------------------------------------------------------|
+| -s     | subjid    | a subjid to create and execute the batch on, can be a list separated by spaces|
+|--------+-------------+-------------------------------------------------------------|
+| -f     | subject file | a file containing your subjectids, with each ID on its own line         |
+|--------+-------------+-------------------------------------------------------------|
+
+
+For example:
+#+begin_example
+genPreprocBatches -t /ncf/mylab/myspace/myexp/subject1/batch/preproc_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2 
+#+end_example
+
+This will create a batch file for each subject provided, and save it in ~subjid/batches~.
+It will then bsub the created batch.  
+
 
 Within the ~analysis~ directory is a ~paradigms~ directory, with a directory for each run.
 For first level analysis, each condition should have it's own onset .txt file,
 with each row being a single onset time.  The name of the file should be the name
 given to each condition within the SPM batch, followed by the .txt extension.
-
-* ~genPreprocBatch.py~
-
-The goal of this script is to eliminate the need for the repeated use of the SPM GUI.
-Using the GUI once, it is possible to create a template batch file, then use
-this template file to generate the batch scripts for other subjects
-with the same preprocessing steps.
-
-
-~python genPreprocBatch.py -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...~
-or
-~python genPreprocBatch.py -t TEMPLATE -p PATH -f SUBJECTFILE~
-|---------------+-------------------------------------------------------------------------|
-| Input         | Description                                                             |
-|---------------+-------------------------------------------------------------------------|
-| ~TEMPLATE~    |the full path and the name of the template batch created in the SPM GUI via a "save batch as script" command, that ends in _job.m |
-|---------------+-------------------------------------------------------------------------|
-| ~PATH~        | the path to the directory that contains all of your subjects            |
-|---------------+-------------------------------------------------------------------------|
-| ~SUBJECT1~    | a list separated by spaces containing your subjectids for analysis      |
-|---------------+-------------------------------------------------------------------------|
-| ~SUBJECTFILE~ | a file containing your subjectids, with each ID on its own line         |
-|---------------+-------------------------------------------------------------------------|
-
-
-For example:
-#+begin_example
-python genPreprocBatch.py -t /ncf/labspace/subject_dir/subject1/batch/preproc_job.m -p /ncf/labspace/subject_dir/ -s subject2 
-#+end_example
-
 
 * Acknowledgments
 These scripts were written by Alex Storer, Caitlin Carey and Stephanie
