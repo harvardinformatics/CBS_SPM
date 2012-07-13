@@ -88,7 +88,7 @@ getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
 
 For example:
 #+begin_example -t
-getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/
+~getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/~
 #+end_example
 
 This creates the following directory tree:
