@@ -27,10 +27,10 @@ Directory structure:
 The scripts relys on the following directory structure which will automatically be created for you via the first script, getsubject.m.
 
 
-   |-mystudydir   
-   |---120418_mysubject
-   |-----RAW
-   |/-------dicom files.../
+   |-mystudydir   |
+   |---120418_mysubject|
+   |-----RAW|
+   |/-------dicom files.../|
    |-----analysis
    |-------paradigms
    |---------run001,run002,...
