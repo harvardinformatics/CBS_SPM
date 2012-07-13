@@ -26,24 +26,22 @@ the default environment as specified on the FAQ site (
 Directory structure:
 The scripts relys on the following directory structure which will automatically be created for you via the first script, getsubject.m.
 
-
-   |-mystudydir   |
-   |---120418_mysubject|
-   |-----RAW|
-   |/-------dicom files.../|
-   |-----analysis
-   |-------paradigms
-   |---------run001,run002,...
-   |-----------/cond1.txt, cond2.txt.../
-   |-------/spm files from first level analysis.../
-   |-----batch
-   |-------/spm batches.../
-   |-----preproc
-   |-------/converted dicoms, preprocessed data.../
-   |-----output_files
-   |-------/files containing error messages from scripts/
-
 #+begin_example
+   |-mystudydir   
+   |---120418_mysubject
+   |------RAW
+   |---------dicom files...
+   |------analysis
+   |---------paradigms
+   |------------run001,run002,...
+   |---------------cond1.txt, cond2.txt...
+   |------spm files from first level analysis...
+   |------batch
+   |---------spm batches...
+   |------preproc
+   |---------converted dicoms, preprocessed data...
+   |------output_files
+   |---------files containing error messages from scripts
 #+end_example
 
 
@@ -64,9 +62,9 @@ one listed on the FAQ site
 
 ~getsubject.py~ is a script that pulls data from the CBS
 repository (or a directory), converts it to SPM format (img), and creates a directory structure for 
-it that will allow the use of the other scripts described here for gui free analysis of spm data. 
+it that will allow the use of the other scripts described here for GUI free analysis of spm data. 
 
-It takes the following inputs in any order.  For help, type -h:
+It takes the following inputs in any order.  For help, type getsubject -h:
 
 getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
 
@@ -90,24 +88,24 @@ getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
 
 For example:
 #+begin_example
-getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/
+getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p \/ncf\/mylab\/myspace\/myexp\/
 #+end_example
 
 This creates the following directory tree:
 
    |-myexp   
-   |---120418_spmtest
-   |-----RAW
-   |-----analysis
-   |-------paradigms
-   |---------run001,run002,...
-   |-----batch
-   |-----preproc
-   |-----output_files
+   |----120418_spmtest
+   |-------RAW
+   |-------analysis
+   |----------paradigms
+   |-------------run001,run002,...
+   |-------batch
+   |-------preproc
+   |-------output_files
 
-Within the ~RAW~ directory is a tarball (/[subjectname].tar.gz/)
+Within the ~RAW~ directory is a tarball ([subjectname].tar.gz)
 containing the DICOMs in a compressed format.  In the ~preproc~ directory
-will be the SPM converted files /.img and .hdr/. 
+will be the SPM converted files .img and .hdr. 
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
