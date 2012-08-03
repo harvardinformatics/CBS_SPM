@@ -37,6 +37,9 @@ end
 % Get current wd
 startingwd = pwd;
 
+% Keep track of the directories we create
+newdirs = {};
+
 %% If we're not using cbs_get, copy the files
 if exist('dicompath')
     disp('Not running cbsget: copying files instead')
@@ -44,15 +47,20 @@ if exist('dicompath')
     if status~=0
         error(['getsubject could not be run successfully!  The subject directory may already exist.' 10 result])
     end
+    newdirs{end+1} = fullfile(destpath,subjectid);
+
     [status result] = system(['mkdir ' fullfile(destpath,subjectid,'RAW')]);
     if status~=0
+        rmdirs(newdirs)
         error(['getsubject could not be run successfully!' 10 result])
     end
+    newdirs{end+1} = fullfile(destpath,subjectid,'RAW');
     disp('Copying files as follows:')
     cpcmd = ['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')];
     disp(cpcmd);
     [status result] = system(['cp ' dicompath '/* ' fullfile(destpath,subjectid,'RAW')]);
     if status~=0
+        rmdirs(newdirs)
         error(['getsubject could not be run successfully!' 10 result])
     end
 else
@@ -78,6 +86,7 @@ else
     [status,result] = system(cbscmd);
     
     if status~=0
+        rmdirs(newdirs)
         error(['cbsget could not be run successfully!' 10 result])
     end
     
@@ -90,6 +99,7 @@ else
     [status,result] = system(unzipcmd);
     
     if status~=0
+        rmdirs(newdirs)
         error(['DICOM archive could not be unzipped successfully!' 10 result])
     end
     
@@ -109,8 +119,10 @@ for d = 1:length(dirnames)
     [status,result] = system(mkcmd);
     
     if status~=0
+        rmdirs(newdirs)
         error(['mkdir command could not be run successfully!' 10 result])
     end
+    newdirs{end+1} = [destpath '/' subjectid '/' dirnames{d}];
     
 end
     
@@ -121,8 +133,10 @@ disp(mkcmd)
 [status,result] = system(mkcmd);
 
 if status~=0
+    rmdirs(newdirs)
     error(['mkdir command could not be run successfully!' 10 result])
 end
+newdirs{end+1} = [destpath '/' subjectid '/analysis/paradigms'];
 
 
 %% Run spm convert on the files
@@ -148,11 +162,15 @@ for b = 1:length(boldruns)
     [status,result] = system(mkcmd);
     
     if status~=0
+        rmdirs(newdirs)
         error(['mkdir command could not be run successfully!' 10 result])
     end
+    newdirs{end+1} = [destpath '/' subjectid '/analysis/paradigms/run' newrunstr];
+    
     
     bruns = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     if (length(bruns)<1)
+        rmdirs(newdirs)
         error(['No dicoms found for run ' runstr ' - did SPM provide warning messages?'])
     end
     for br = 1:length(bruns)
@@ -163,6 +181,7 @@ for b = 1:length(boldruns)
         [status,result] = system(cmdname);
     
         if status~=0
+            rmdirs(newdirs)
             error(['File could not be moved!' 10 result])
         end
         
@@ -182,6 +201,7 @@ for sr = 1:length(srun)
     [status,result] = system(cmdname);
     
     if status~=0
+        rmdirs(newdirs)
         error(['File could not be moved!' 10 result])
     end
 end
@@ -200,6 +220,7 @@ if length(fmruns)==2
         [status,result] = system(cmdname);
         
         if status~=0
+            rmdirs(newdirs)
             error(['File could not be moved!' 10 result])
         end
     end
@@ -213,6 +234,7 @@ if length(fmruns)==2
         [status,result] = system(cmdname);
         
         if status~=0
+            rmdirs(newdirs)
             error(['File could not be moved!' 10 result])
         end
     end    
@@ -233,7 +255,8 @@ disp(tgzcmd)
 [status,result] = system(tgzcmd);
 
 if status~=0
-   error(['DICOM archive could not be created successfully!' 10 result])
+    rmdirs(newdirs)
+    error(['DICOM archive could not be created successfully!' 10 result])
 end
 
 disp('Complete!')
@@ -275,6 +298,7 @@ if ~exist('dicompath')
     [status,result] = system(rmcmd);
     
     if status~=0
+        rmdirs(newdirs)
         error(['Original zip file could not be removed!' 10 result])
     end
     
@@ -285,3 +309,18 @@ end
 disp('********************************************************')
 disp('*                    Thank You!                        *')
 disp('********************************************************')
+
+end
+
+function [] = rmdirs(dirarray)
+disp('Removing created directories...')
+for i = 1:length(dirarray)
+        rmcmd = ['rm -r ' dirarray{i}];
+
+        [status,result] = system(rmcmd);
+
+        if status~=0
+           warning(['Directory could not removed!' 10 result])
+        end    
+end
+end

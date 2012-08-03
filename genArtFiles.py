@@ -2,6 +2,7 @@
 import argparse
 import os
 
+
 parser = argparse.ArgumentParser(description='Generates files necessary to run your first level analysis with art')
 parser.add_argument('-p','--path', help='the path to the directory containing the subjects', required=True, nargs=1)
 

@@ -21,7 +21,9 @@ All scripts require that you be on the cluster, and were tested using
 Matlab 2012a with spm version 8.4667, and python version 2.7.3.  
 Use with older versions of matlab is unsupported, and is known
 to fail using Matlab 2007. In order to access the scripts, you should be using
-the default environment as specified on the FAQ site (
+the default environment as specified on the FAQ site (http://cbs.fas.harvard.edu/science/core-facilities/neuroimaging/information-investigators/faq).  Please also see the FAQ for detailed information on how to select your matlab and SPM versions.
+
+
 
 Directory structure:
 The scripts relys on the following directory structure which will automatically be created for you via the first script, getsubject.m.
@@ -87,7 +89,7 @@ getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
 |--------+-------------+-------------------------------------------------------------|
 
 For example:
-#+begin_example -t
+#+begin_example
 ~getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/~
 #+end_example
 
@@ -103,7 +105,7 @@ This creates the following directory tree:
    |-------preproc
    |-------output_files
 
-Within the ~RAW~ directory is a tarball ([subjectname].tar.gz)
+Within the ~RAW~ directory is a tarball (subjectid.tar.gz)
 containing the DICOMs in a compressed format.  In the ~preproc~ directory
 will be the SPM converted files .img and .hdr. 
 
@@ -123,19 +125,25 @@ renamed as follows:
 | s-fieldmap_phase.img    | The phase of the fieldmap                   |
 |-------------------------+---------------------------------------------|
 
+***Errors
+If there is a problem with the script, the output will go to the screen (standard out) for debugging.
+Most likely issues are not having a config file for CBSget (see FAQ), having the wrong numbers for your
+bold runs, or the subject name of the data you are trying to unpack already exists.
 
-* ~genPreprocBatch.py~
+* ~genPreprocBatches.py~
 
 The goal of this script is to take a batch file created to perform preprocessing
 on a single subject and use it to analyze many subjects.  This is done by saving
 your batch via the 'save as script' command in SPM. This creates a 
 batchname_job.m file, which will serve as your template batch. This batch will be
 applied to all of the subjects provided, which can include the original subject 
-that was used to create the template.
+that was used to create the template. This script has been tested with fieldmap, slice time correction,
+motion correction, indirect spatial normalization, smoothing. If you use any additional steps, you 
+should check that the generated batches are correct.
 
 
-genPreprocBatches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2...
-or
+genPreprocBatches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
+or \\
 genPreprocBatches -t TEMPLATE -p PATH -f SUBJECTFILE
 |--------+-------------+-------------------------------------------------------------|
 |Flag    | Stands for  | Description                                                 |
@@ -148,23 +156,148 @@ genPreprocBatches -t TEMPLATE -p PATH -f SUBJECTFILE
 |--------+-------------+-------------------------------------------------------------|
 | -s     | subjid    | a subjid to create and execute the batch on, can be a list separated by spaces|
 |--------+-------------+-------------------------------------------------------------|
-| -f     | subject file | a file containing your subjectids, with each ID on its own line         |
+| -f     | subject file | a file containing your subjectids, with each ID on its own line, which can be used instead of -s flag |
 |--------+-------------+-------------------------------------------------------------|
 
 
 For example:
 #+begin_example
-genPreprocBatches -t /ncf/mylab/myspace/myexp/subject1/batch/preproc_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2 
+~genPreprocBatches -t /ncf/mylab/myspace/myexp/subject1/batch/preproc_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2~ 
 #+end_example
 
 This will create a batch file for each subject provided, and save it in ~subjid/batches~.
-It will then bsub the created batch.  
+It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
+
+***Errors
+If there is a problem with converting the template batch for each subject, the error messages will be placed
+in the the study directory ~mystudy~, with the name errors_preproc followed by the date and time (to the min).
+
+For example:
+errors_preproc2012_07_06_10h_23m
+
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_preproc followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+
+For example:
+output_preproc2012_06_20_11h_41m
 
 
-Within the ~analysis~ directory is a ~paradigms~ directory, with a directory for each run.
-For first level analysis, each condition should have it's own onset .txt file,
+
+* ~genL1Batches.py~
+
+The goal of this script is to take a batch file created to perform first level analysis
+on a single subject and use it to analyze many subjects.  This is done by saving
+your batch via the 'save as script' command in SPM. This creates a 
+batchname_job.m file, which will serve as your template batch. This batch will be
+applied to all of the subjects provided, which can include the original subject 
+that was used to create the template. To run this script, you need to have your paradigm files constructed.
+
+***Creating batch
+There are a few quirks about how you can create your level1 batch.
+1. dont use the 'replicate Subject/Session' option in fMRI model specification.
+2. The names you use for your conditions will need to be the names of the text
+files containing your stimulus onset values (see below), so don't put spaces in the name.
+3. When you make your contrasts in Contrast Manager, you can use either the T- and F-contrasts,
+or the T-contrast (cond/sess based) options.  Do not use the Replicate option.  The cond/sess method
+is preferred, as it is harder to make errors.  However, you will still need to build your F-contrast by hand.
+
+***Running script
+genL1Batches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
+or \\
+genL1Batches -t TEMPLATE -p PATH -f SUBJECTFILE
+|--------+-------------+-------------------------------------------------------------|
+|Flag    | Stands for  | Description                                                 |
+|--------+-------------+-------------------------------------------------------------|
+| -h     | help        | provides usage message and then exits                       |
+|--------+-------------+-------------------------------------------------------------|
+| -t     | template batch |the full path to, and name of the template batch created in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+|--------+-------------+-------------------------------------------------------------|
+| -p     | path        | the path to the directory that contains all of your subjects |
+|--------+-------------+-------------------------------------------------------------|
+| -s     | subjid    | a subjid to create and execute the batch on, can be a list separated by spaces|
+|--------+-------------+-------------------------------------------------------------|
+| -f     | subject file | a file containing your subjectids, with each ID on its own line, which can be used instead of -s |
+|--------+-------------+-------------------------------------------------------------|
+
+
+For example:
+#+begin_example
+~genL1Batches -t /ncf/mylab/myspace/myexp/subject1/batch/L1_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2~ 
+#+end_example
+
+This will create a batch file for each subject provided, and save it in ~subjid/batches~.
+It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
+
+***Stimulus onset files
+Within the ~analysis~ directory is a ~paradigms~ directory, with a directory for each run, ~run001~.
+For the first level analysis, each condition should have it's own onset text file,
 with each row being a single onset time.  The name of the file should be the name
-given to each condition within the SPM batch, followed by the .txt extension.
+given to each condition within the SPM batch, followed by the .txt extension, ~cond1.txt~. 
+Therefore, if you have 3 runs, you will end up with three text files for cond1. 
+They will all be called cond1.txt, but placed in each run directory run001, run002, and run003.
+If your stimulus is presented 4 times per run, than each of those files will have 4 rows, with each
+row having the time in seconds (or TRs, depending on what you specify in your batch)
+when your stimulus was presented. These can be made up in matlab, or any text editor.
+
+***Errors
+If there is a problem with converting the template batch for each subject, the error messages will be placed
+in the the study directory ~mystudy~, with the name errors_L1 followed by the date and time (to the min).
+
+For example:
+errors_L12012_07_06_10h_23m
+
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_preproc followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+
+For example:
+output_L12012_06_20_11h_41m
+
+
+
+* ~genArtFiles.py~
+
+The goal of this script is to set up files and parameters for rerunning your 
+level1 analysis with ART. Currently, the global_mean type is hard coded to be type 1, or standard.
+In addition, the motion_file_type is set to 0, or SPM .txt file.
+
+
+
+genArtFiles -p PATH -s SUBJECT1 SUBJECT2 -gt GLOBALTHRESHOLD -mt MOTIONTHRESHOLD -g DIFFGLOBAL -m DIFFMOTION -n NORMS\\
+or \\
+genArtFiles -p PATH -f SUBJECTFILE -gt GLOBALTHRESHOLD -mt MOTIONTHRESHOLD -g DIFFGLOBAL -m DIFFMOTION -n NORMS
+|--------+-------------+-------------------------------------------------------------|
+|Flag    | Stands for  | Description                                                 |
+|--------+-------------+-------------------------------------------------------------|
+| -h     | help        | provides usage message and then exits                       |
+|--------+-------------+-------------------------------------------------------------|
+| -p     | path        | the path to the directory that contains all of your subjects |
+|--------+-------------+-------------------------------------------------------------|
+| -s     | subjid    | a subjid to create and execute the batch on, can be a list separated by spaces|
+|--------+-------------+-------------------------------------------------------------|
+| -f     | subject file | a file containing your subjectids, with each ID on its own line, which can be used instead of -s |
+|--------+-------------+-------------------------------------------------------------|
+|
+|--------+-------------+-------------------------------------------------------------|
+For example:
+#+begin_example
+~genL1Batches -t /ncf/mylab/myspace/myexp/subject1/batch/L1_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2~ 
+#+end_example
+
+This will create a batch file for each subject provided, and save it in ~subjid/batches~.
+It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
+
+
+***Errors
+If there is a problem with converting the template batch for each subject, the error messages will be placed
+in the the study directory ~mystudy~, with the name errors_L1 followed by the date and time (to the min).
+
+For example:
+errors_L12012_07_06_10h_23m
+
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_preproc followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+
+For example:
+output_L12012_06_20_11h_41m
+
+
 
 * Acknowledgments
 These scripts were written by Alex Storer, Caitlin Carey and Stephanie
