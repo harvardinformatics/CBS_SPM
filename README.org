@@ -125,7 +125,7 @@ renamed as follows:
 | s-fieldmap_phase.img    | The phase of the fieldmap                   |
 |-------------------------+---------------------------------------------|
 
-***Errors
+*** Errors
 If there is a problem with the script, the output will go to the screen (standard out) for debugging.
 Most likely issues are not having a config file for CBSget (see FAQ), having the wrong numbers for your
 bold runs, or the subject name of the data you are trying to unpack already exists.
