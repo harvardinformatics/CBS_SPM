@@ -168,7 +168,7 @@ For example:
 This will create a batch file for each subject provided, and save it in ~subjid/batches~.
 It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
 
-***Errors
+*** Errors
 If there is a problem with converting the template batch for each subject, the error messages will be placed
 in the the study directory ~mystudy~, with the name errors_preproc followed by the date and time (to the min).
 
@@ -191,7 +191,7 @@ batchname_job.m file, which will serve as your template batch. This batch will b
 applied to all of the subjects provided, which can include the original subject 
 that was used to create the template. To run this script, you need to have your paradigm files constructed.
 
-***Creating batch
+*** Creating batch
 There are a few quirks about how you can create your level1 batch.
 1. dont use the 'replicate Subject/Session' option in fMRI model specification.
 2. The names you use for your conditions will need to be the names of the text
@@ -200,7 +200,7 @@ files containing your stimulus onset values (see below), so don't put spaces in 
 or the T-contrast (cond/sess based) options.  Do not use the Replicate option.  The cond/sess method
 is preferred, as it is harder to make errors.  However, you will still need to build your F-contrast by hand.
 
-***Running script
+*** Running script
 genL1Batches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
 or \\
 genL1Batches -t TEMPLATE -p PATH -f SUBJECTFILE
@@ -227,7 +227,7 @@ For example:
 This will create a batch file for each subject provided, and save it in ~subjid/batches~.
 It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
 
-***Stimulus onset files
+*** Stimulus onset files
 Within the ~analysis~ directory is a ~paradigms~ directory, with a directory for each run, ~run001~.
 For the first level analysis, each condition should have it's own onset text file,
 with each row being a single onset time.  The name of the file should be the name
@@ -238,14 +238,14 @@ If your stimulus is presented 4 times per run, than each of those files will hav
 row having the time in seconds (or TRs, depending on what you specify in your batch)
 when your stimulus was presented. These can be made up in matlab, or any text editor.
 
-***Errors
+*** Errors
 If there is a problem with converting the template batch for each subject, the error messages will be placed
 in the the study directory ~mystudy~, with the name errors_L1 followed by the date and time (to the min).
 
 For example:
 errors_L12012_07_06_10h_23m
 
-The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_preproc followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_L1 followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
 
 For example:
 output_L12012_06_20_11h_41m
@@ -255,8 +255,8 @@ output_L12012_06_20_11h_41m
 * ~genArtFiles.py~
 
 The goal of this script is to set up files and parameters for rerunning your 
-level1 analysis with ART. Currently, the global_mean type is hard coded to be type 1, or standard.
-In addition, the motion_file_type is set to 0, or SPM .txt file.
+level1 analysis with ART. Currently, the global_mean type is hard coded to be type 1, or standard, and
+ the motion_file_type is set to 0, for a SPM .txt file.
 
 
 
@@ -274,29 +274,78 @@ genArtFiles -p PATH -f SUBJECTFILE -gt GLOBALTHRESHOLD -mt MOTIONTHRESHOLD -g DI
 |--------+-------------+-------------------------------------------------------------|
 | -f     | subject file | a file containing your subjectids, with each ID on its own line, which can be used instead of -s |
 |--------+-------------+-------------------------------------------------------------|
-|
+| -gt    |global mean threshold |  threshold for excluding outliers, in stdev away from the mean|
 |--------+-------------+-------------------------------------------------------------|
+| -mt    |motion threshold |  threshold for excluding outliers, in mm of movement|
+|--------+-------------+-------------------------------------------------------------|
+| -g    |global diff | 1=yes, 0=no, whether you want to 'Use Differences" for global mean threshold|
+|--------+-------------+-------------------------------------------------------------|
+| -m    |motion diff | 1=yes, 0=no, | use movement differences, not absolute from first tp|
+|--------+-------------+-------------------------------------------------------------|
+| -n    |use norms |  1=combine all movement directions (linear and angular) 0=no |
+|--------+-------------+-------------------------------------------------------------|
+
+
 For example:
 #+begin_example
-~genL1Batches -t /ncf/mylab/myspace/myexp/subject1/batch/L1_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2~ 
+~genArtFiles -p /ncf/mylab/myspace/myexp/ -s subject1 subject2 -gt 2 -mt .5 -g 0 -m 0 -n 1~ 
 #+end_example
 
-This will create a batch file for each subject provided, and save it in ~subjid/batches~.
-It will then bsub the created batch. You can check that your submitted jobs are running via the bjobs command (see FAQ for instructions).  
+This will create a new directory called ~art_analysis~, at the same level as the original analysis directory.
+This directory will contain several files need for Art, or created by Art: art_config001.cfg, 
+art_exec001.m, art_mask.hdr/img, art_mask_temporalfile.mat, SPM_stats_file.  It will also created new regression
+file for regressing out outliers with or without motion (art_regression_outliers_swrf-run001-001.mat, or
+art_regression_outliers_and_movement_swrf-run001-001.mat).  There will be one of each for every run.
+
+*** Errors
+If there is a problem creating the files for Art, the error messages will be placed
+in the the study directory ~mystudy~, with the name errors_ART followed by the date and time (to the min).
+
+For example:
+errors_ART_2012_07_06_10h_23m
+
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_ART followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+
+For example:
+output_ART2012_06_20_11h_41m
 
 
-***Errors
+* ~genL1ArtBatches.py~
+
+The goal of this script is to take a batch file created to perform first level analysis using ART outlier exclusion
+on a single subject and use it to analyze many subjects.  The usage and output is the same as ~genL1Batches~ 
+except that the output goes in to ~art_analysis~ directory.
+
+*** Running script
+genL1ArtBatches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
+or \\
+genL1ArtBatches -t TEMPLATE -p PATH -f SUBJECTFILE
+|--------+-------------+-------------------------------------------------------------|
+|Flag    | Stands for  | Description                                                 |
+|--------+-------------+-------------------------------------------------------------|
+| -h     | help        | provides usage message and then exits                       |
+|--------+-------------+-------------------------------------------------------------|
+| -t     | template batch |the full path to, and name of the template batch created in the SPM GUI via a "save batch as script" command, that ends in _job.m |
+|--------+-------------+-------------------------------------------------------------|
+| -p     | path        | the path to the directory that contains all of your subjects |
+|--------+-------------+-------------------------------------------------------------|
+| -s     | subjid    | a subjid to create and execute the batch on, can be a list separated by spaces|
+|--------+-------------+-------------------------------------------------------------|
+| -f     | subject file | a file containing your subjectids, with each ID on its own line, which can be used instead of -s |
+|--------+-------------+-------------------------------------------------------------|
+
+
+*** Errors
 If there is a problem with converting the template batch for each subject, the error messages will be placed
-in the the study directory ~mystudy~, with the name errors_L1 followed by the date and time (to the min).
+in the the study directory ~mystudy~, with the name errors_L1ART followed by the date and time (to the min).
 
 For example:
-errors_L12012_07_06_10h_23m
+errors_L1ART2012_07_06_10h_23m
 
-The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_preproc followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
+The output from the running of the batch (that comes via the bsub output) will be stored in ~subjid/output_files~, with the name output_L1ART followed by the date and time (to the min). This is where errors thrown by matlab or SPM will show up.
 
 For example:
-output_L12012_06_20_11h_41m
-
+output_L1ART2012_06_20_11h_41m
 
 
 * Acknowledgments
