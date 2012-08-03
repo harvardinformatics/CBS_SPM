@@ -2,8 +2,8 @@
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description='Download a single SPM subject and set up the correct directory structure.')
-parser.add_argument('-b','--basedir', help='the path containing the subject directories (e.g. /users/me/data)', required=True, nargs=1)
+parser = argparse.ArgumentParser(description='Generates files necessary to run your first level analysis with art')
+parser.add_argument('-p','--path', help='the path to the directory containing the subjects', required=True, nargs=1)
 
 parser.add_argument('-s','--subjectid', help='the name of the subject(s)', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='the name of the file containing subject(s)', required=False, nargs=1)
@@ -30,7 +30,7 @@ else:
     raise Exception("Must specify either a subject file (-f) or subjectid (-s)")
     
 runcmd = 'matlab -nodisplay -r "try; genArtBatches('
-runcmd += "\'"+args["basedir"][0]+"\'"
+runcmd += "\'"+args["path"][0]+"\'"
 runcmd += ','+substr
 if args["diffglobal"]:
     runcmd += ',1'
