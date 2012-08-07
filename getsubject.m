@@ -282,7 +282,7 @@ for i = 1:length(myfiles)
         [status,result] = system(rmcmd);
 
         if status~=0
-           warning(['File could not removed!' 10 result])
+           warning(['File could not be removed!' 10 result])
         end
     end
 end
@@ -313,14 +313,24 @@ disp('********************************************************')
 end
 
 function [] = rmdirs(dirarray)
-disp('Removing created directories...')
-for i = 1:length(dirarray)
-        rmcmd = ['rm -r ' dirarray{i}];
 
-        [status,result] = system(rmcmd);
+disp('Removing top level directory...')
+rmcmd = ['rm -r ' dirarray{1}];
 
-        if status~=0
-           warning(['Directory could not removed!' 10 result])
-        end    
+[status,result] = system(rmcmd);
+
+if status~=0
+    warning(['Directory could not be removed!' 10 result])
 end
+
+% disp('Removing created directories...')
+% for i = 1:length(dirarray)
+%         rmcmd = ['rm -r ' dirarray{i}];
+% 
+%         [status,result] = system(rmcmd);
+% 
+%         if status~=0
+%            warning(['Directory could not be removed!' 10 result])
+%         end    
+% end
 end
