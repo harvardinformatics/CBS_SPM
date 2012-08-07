@@ -38,7 +38,7 @@ runcmd += ','
 runcmd += "\'"+args["destpath"][0]+"\'"
 if args["nii"]:
     runcmd += ",\'"+str(1)+"\'"
-else
+else:
     runcmd += ",\'"+str(0)+"\'"
 if args["dicompath"]:
     runcmd += ",\'"+args["dicompath"][0]+"\'"
