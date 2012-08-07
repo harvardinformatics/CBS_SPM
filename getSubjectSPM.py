@@ -9,6 +9,7 @@ parser.add_argument('-b','--boldruns', help='the run numbers for the BOLD scans 
 parser.add_argument('-t','--structrun', help='the run number for the structural scan', required=True, nargs=1)
 parser.add_argument('-m','--fieldmap', help='the run numbers for the fieldmap scans (if present, the two runs, e.g. 6 7)', required=False, nargs=2)
 parser.add_argument('-d','--dicompath', help="the path to dicoms, in the event that you don't want to  cbsget, but you do have the dicoms already unzipped in a folder.", required=False, nargs=1)
+parser.add_argument('-n','--nii', help="use single file NIfTI format (.nii) outputs", required=False, nargs=0)
 args = vars(parser.parse_args())
 
 # subjectid:  the name of the subject in CBSCentral (in single quotes, e.g. 'my_subj_name')
@@ -35,11 +36,14 @@ else:
     runcmd += '[]'
 runcmd += ','
 runcmd += "\'"+args["destpath"][0]+"\'"
+if args["nii"]:
+    runcmd += ",\'"+str(1)+"\'"
+else
+    runcmd += ",\'"+str(0)+"\'"
 if args["dicompath"]:
     runcmd += ",\'"+args["dicompath"][0]+"\'"
 runcmd += ')'
 runcmd += '; catch ME; disp(ME.message);'
 runcmd += "end; exit()\""
-
 
 os.system(runcmd)

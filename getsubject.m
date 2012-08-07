@@ -1,4 +1,4 @@
-function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,varargin)
+function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,usesingle,varargin)
 %GETSUBJECT   Get subject data from the network and convert to spm. 
 %   GETSUBJECT(subjectid, boldruns, structrun,fmruns,destpath[,dicompath]) downloads
 %   data using cbsget, processes it with spm and renames the files and
@@ -23,7 +23,7 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,varargin)
 % subjectid = '120418_spmtest';
 % destpath = '/tmp';
 
-if nargin>5
+if nargin>6
     dicompath = varargin{1};
 end
 
@@ -146,7 +146,11 @@ cd(fullfile(destpath,subjectid,'RAW'))
 dicom_files = spm_select('list',fullfile(destpath,subjectid,'RAW'),'.dcm');
 disp(['Number of DICOMs: ' num2str(length(dicom_files))])
 hdrs = spm_dicom_headers(dicom_files);
-spm_dicom_convert(hdrs,'all');
+if usesingle
+    spm_dicom_convert(hdr,'all','flat','nii')
+else
+    spm_dicom_convert(hdrs,'all');    
+end
 disp('...complete!')
 
 %% Rename hdr and img files to smaller pathnames
