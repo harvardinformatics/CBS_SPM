@@ -147,7 +147,7 @@ dicom_files = spm_select('list',fullfile(destpath,subjectid,'RAW'),'.dcm');
 disp(['Number of DICOMs: ' num2str(length(dicom_files))])
 hdrs = spm_dicom_headers(dicom_files);
 if usesingle
-    spm_dicom_convert(hdr,'all','flat','nii')
+    spm_dicom_convert(hdrs,'all','flat','nii')
 else
     spm_dicom_convert(hdrs,'all');    
 end
