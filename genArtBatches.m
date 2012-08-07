@@ -11,12 +11,12 @@
 %                  genArtBatches('/ncf/snp/06/SPAA/CBS/MID_analysis_art',{'subject1','subject2','subject3'},0,1,0,4,3)
 %         This will create a subdirectory called 'art_analysis' and place
 %         in this directory a configuration file and matlab art run script.
-function genArtBatches(base_dir,subjects, input_use_diff_global, input_use_diff_motion, input_use_norms, input_global_threshold, input_motion_threshold)
+function genArtBatches(base_dir,subjects, input_use_diff_global, input_use_diff_motion, input_use_norms, input_global_threshold, input_motion_threshold, input_global_mean, input_motion_file_type)
 addpath('/ncf/snp/11/tools/art');
 thisdir = pwd();
 %%%%%%%%%%%% ART PARAMETERS (edit to desired values) %%%%%%%%%%%%
-global_mean=1;              % global mean type (1: Standard 2: Every Voxel 3: User Mask 4: Auto)
-motion_file_type=0;         % motion file type (0: SPM .txt file 1: FSL .par file 2:Siemens .txt file) hard code for now
+global_mean=input_global_mean;                   % global mean type (1: Standard 2: Every Voxel 3: User Mask 4: Auto)
+motion_file_type=input_motion_file_type;         % motion file type (0: SPM .txt file 1: FSL .par file 2:Siemens .txt file) hard code for now
 global_threshold=input_global_threshold;         % threshold for outlier detection based on global signal
 motion_threshold=input_motion_threshold;         % threshold for outlier detection based on motion estimates
 use_diff_global=input_use_diff_global;
