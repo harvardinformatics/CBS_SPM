@@ -12,7 +12,8 @@
 %         This will create a subdirectory called 'art_analysis' and place
 %         in this directory a configuration file and matlab art run script.
 function genArtBatches(base_dir,subjects, input_use_diff_global, input_use_diff_motion, input_use_norms, input_global_threshold, input_motion_threshold, input_global_mean, input_motion_file_type)
-addpath('/ncf/snp/11/tools/art');
+%addpath('/ncf/snp/11/tools/art');
+addpath([ getenv('_HVD_APPS_DIR') filesep 'arch' filesep getenv('_HVD_PLATFORM') filesep 'art' filesep '2011_07'])
 thisdir = pwd();
 %%%%%%%%%%%% ART PARAMETERS (edit to desired values) %%%%%%%%%%%%
 global_mean=input_global_mean;                   % global mean type (1: Standard 2: Every Voxel 3: User Mask 4: Auto)
@@ -87,7 +88,7 @@ for subInd = 1:length(subjects)
         fprintf(fid,'end\n');
         fclose(fid);
     end
-    
+
     % make the run file
     for n1=1:size(files,1)
         runfile=fullfile(artDir,['art_exec',num2str(n1,'%03d'),'.m']);
@@ -102,7 +103,8 @@ for subInd = 1:length(subjects)
         fprintf(fid,['cfgfile=''%s'';\n'],cfgfile);
         dispstr = ['''running subject ',num2str(n1),' using config file ',cfgfile,''''];
         fprintf(fid,['disp(%s)\n'],dispstr);
-        fprintf(fid,['addpath(' 39 '/ncf/snp/11/tools/art' 39 ');\n']);
+        %fprintf(fid,['addpath(' 39 '/ncf/snp/11/tools/art' 39 ');\n']);
+	fprintf(fid,['addpath([getenv(' 39 '_HVD_APPS_DIR' 39 ') filesep ' 39 'arch' 39 ' filesep getenv(' 39 '_HVD_PLATFORM' 39 ') filesep ' 39 'art' 39 ' filesep ' 39 '2011_07' 39 ']);\n']);
         artstr = ['art(''sess_file'',''' cfgfile ''',''stats_file'',''' save_filename ''');'];
         fprintf(fid,'%s\n',artstr);
         % close the window after specified time
