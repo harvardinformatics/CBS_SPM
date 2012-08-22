@@ -8,8 +8,7 @@ parser.add_argument('-t','--template', help='The name of the batchfile, e.g., my
 
 parser.add_argument('-s','--subjectid', help='the name of the subject(s)', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='the name of the file containing subject(s)', required=False, nargs=1)
-parser.add_argument('-m','--usemovement', help='Include the movement regressors from ART', required=False)
-
+parser.add_argument('-m','--usemovement', help='Include the movement regressors from ART', required=False, action='store_true')
 
 args = vars(parser.parse_args())
 

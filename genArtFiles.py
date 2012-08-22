@@ -13,11 +13,11 @@ parser.add_argument('-gt','--globalthreshold', help='Threshold for outlier based
 
 parser.add_argument('-mt','--motionthreshold', help='Include for use_diff_global', required=True, nargs=1)
 
-parser.add_argument('-g','--diffglobal', help='Include for use_diff_global', required=False)
+parser.add_argument('-g','--diffglobal', help='Include for use_diff_global', required=False, action='store_true')
 
-parser.add_argument('-m','--diffmotion', help='Include for use_diff_motion', required=False)
+parser.add_argument('-m','--diffmotion', help='Include for use_diff_motion', required=False, action='store_true')
 
-parser.add_argument('-n','--norms', help='Include for use_norms', required=False)
+parser.add_argument('-n','--norms', help='Include for use_norms', required=False, action='store_true')
 
 parser.add_argument('-gm','--globalmean', help='global mean type (1: Standard 2: Every Voxel 3: User Mask 4: Auto)', nargs=1, default=1)
 
