@@ -8,6 +8,7 @@ parser.add_argument('-t','--template', help='The name of the batchfile, e.g., my
 
 parser.add_argument('-s','--subjectid', help='the name of the subject(s)', required=False, nargs='*')
 parser.add_argument('-f','--subjectfile', help='the name of the file containing subject(s)', required=False, nargs=1)
+parser.add_argument('-m','--usemovement', help='Include the movement regressors from ART', required=False)
 
 
 args = vars(parser.parse_args())
@@ -23,6 +24,10 @@ runcmd = 'matlab -nodisplay -r "try; genL1PostArt('
 runcmd += "\'"+args["path"][0]+"\'"
 runcmd += ','+substr+','
 runcmd += "{\'"+args["template"][0]+"\'}"
+if args["usemovement"]:
+    runcmd += ",true"
+else:
+    runcmd += ",false"
 runcmd += ')'
 runcmd += '; catch ME; disp(ME.message);'
 runcmd += "end; exit()\""

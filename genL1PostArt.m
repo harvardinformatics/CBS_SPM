@@ -2,12 +2,12 @@
 % CBS SPM preprocessing batch package -- Template Overwrite Script
 % Created by Caitlin Carey
 %
-% function genL1PostArt(base_dir,subjects,batchname)
+% function genL1PostArt(base_dir,subjects,batchname,useMovement)
 %
 % Example call:
-% genL1PostArt('/ncf/snp/06/SPAA/CBS/MID_analysis_art',{'subject1','subject2','subject3'},{'myLevel1Batch.m'})
+% genL1PostArt('/ncf/snp/06/SPAA/CBS/MID_analysis_art',{'subject1','subject2','subject3'},{'myLevel1Batch.m'},TRUE)
 %--------------------------------------------------------------------------
-function genL1PostArt(base_dir,subjects,batchnames)
+function genL1PostArt(base_dir,subjects,batchnames,useMovement)
 
 if ~iscell(batchnames)
     error('Please enter the batchnames as a cell array.')
@@ -53,7 +53,11 @@ for s = 1:nSub
     end    
     fclose(fid);
     
-    fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+    if useMovement
+        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+    else
+        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_swrf-$1.mat');
+    end        
     
     runstrs = regexp(fcontents,'sess\((\d)\)','tokens');
     nRuns = -1;
@@ -64,7 +68,12 @@ for s = 1:nSub
     end
         
     % replace the regression coefficients
-    fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+    if useMovement
+        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+    else
+        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_swrf-$1.mat');
+    end
+
     
     % replace the analysis directory
     fcontents = regexprep(fcontents,'matlabbatch\{1\}\.spm\.stats\.fmri_spec\.dir = \{(.*)/analysis','matlabbatch{1}.spm.stats.fmri_spec.dir = {$1/art_analysis/');
@@ -73,7 +82,12 @@ for s = 1:nSub
     zeropad = zeros(1,nRuns);
     
     for i = 1:nRuns
-        loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
+        if useMovement
+            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
+        else
+            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
+        end
+
         eval(loadstr)
         zeropad(i) = size(R,2);
     end
