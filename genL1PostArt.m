@@ -33,12 +33,7 @@ end
 nSub = length(subjects);
 for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
-    
-    preprocDir = [subjectDir '/' preprocDir];
-    
-    % load the outlier and movement files
-    
-    
+        
     
     loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_and_movement_swrf-run%03d-001.mat',i)];
 
@@ -62,12 +57,7 @@ for s = 1:nSub
         tline = fgetl(fid);
     end    
     fclose(fid);
-    
-    if useMovement
-        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
-    else
-        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_swrf-$1.mat');
-    end        
+           
     
     runstrs = regexp(fcontents,'sess\((\d)\)','tokens');
     nRuns = -1;
@@ -76,7 +66,23 @@ for s = 1:nSub
             nRuns = max(nRuns,str2double(runstrs{i}{1}{1}));
         end
     end
+    
+    preprocDir = [subjectDir '/' preprocDir];
+    
+    % construct the outlier and movement files without the composite
+    
+    for i = 1:nRuns
+        mvmtstr = sprintf('*f-run%03d*.txt',i);
+        fnames = dir(mvmtstr);
+        movement = load(fnames.name);
+        outliers = load(['art_regression_outliers_swrf-run' sprintf('%03d',i) '-001.mat']);
         
+        R = [outliers.R movement];
+        system(['cp art_regression_outliers_and_movement_swrf-run' sprintf('%03d',i) '-001.mat ' 'art_regression_outliers_and_movement_composite_swrf-run' sprintf('%03d',i) '-001.mat']);
+        save(['art_regression_outliers_and_movement_swrf-run' sprintf('%03d',i) '-001.mat'],'R');
+    end
+    
+    
     % replace the regression coefficients
     if useMovement
         fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
