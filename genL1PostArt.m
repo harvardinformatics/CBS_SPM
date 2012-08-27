@@ -33,6 +33,16 @@ end
 nSub = length(subjects);
 for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
+    
+    preprocDir = [subjectDir '/' preprocDir];
+    
+    % load the outlier and movement files
+    
+    
+    
+    loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_and_movement_swrf-run%03d-001.mat',i)];
+
+    
     try
         [foo bar] = system(['rm ' subjectDir '/art_analysis/SPM.mat']);
         disp(['Removed SPM.mat in art_analysis directory for ' subjects{s}]);
