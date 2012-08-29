@@ -79,10 +79,14 @@ for s = 1:nSub
         fnames = dir(mvmtstr);
         movement = load([subjectDir '/preproc/' fnames.name]);
         outliers = load([subjectDir '/preproc/art_regression_outliers_' artstring '-run' sprintf('%03d',i) '-001.mat']);
+        outliers_plus_movement = load([subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat']);
         
         R = [outliers.R movement];
-        system(['cp ' subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' subjectDir '/preproc/art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
-        save([subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');
+        
+        if size(outliers_plus_movement.R,2)==size(outliers.R,2)+7
+            system(['cp ' subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' subjectDir '/preproc/art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
+        end
+        save([subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');            
     end
     
     if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])))
@@ -91,14 +95,15 @@ for s = 1:nSub
     
     
     % replace the regression coefficients    
+    disp('Replacing regression coefficients with values from ART')
     if useMovement
-        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-00$1.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-0$1.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run00$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run0$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run$1-001.mat' 39 '};']);
     else
-        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-00$1.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-0$1.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run00$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run0$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run$1-001.mat' 39 '};']);
     end
     
     % replace the analysis directory
@@ -107,13 +112,10 @@ for s = 1:nSub
     % how many zeros will be added
     zeropad = zeros(1,nRuns);
     
+    disp('Updating model matrix')
+    
     for i = 1:nRuns
-        if useMovement
-            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/art_regression_outliers_and_movement_' artstring sprintf('-run%03d-001.mat',i)];
-        else
-            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/art_regression_outliers_' artstring sprintf('-run%03d-001.mat',i)];
-        end
-
+        loadstr = ['load ' base_dir '/' subjects{s} '/preproc/art_regression_outliers_' artstring sprintf('-run%03d-001.mat',i)];
         eval(loadstr)
         zeropad(i) = size(R,2);
     end
