@@ -72,8 +72,6 @@ for s = 1:nSub
         end
     end
     
-    preprocDir = [subjectDir '/' preprocDir];
-    
     % construct the outlier and movement files without the composite
     
     for i = 1:nRuns
