@@ -35,9 +35,14 @@ for s = 1:nSub
     subjectDir = [base_dir '/' subjects{s}];
         
     
-    loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_and_movement_swrf-run%03d-001.mat',i)];
-
+    % find the name of the file and hold on to the random letters
+    d = dir([subjectDir '/preproc/art_regression_outliers_*.mat']);
+    artname = d(1).name;
+    r = regexp(artname,'art_regression_outliers_(.*)-run(.*)','tokens');
+    artstring = r{1,1};
     
+    
+
     try
         [foo bar] = system(['rm ' subjectDir '/art_analysis/SPM.mat']);
         disp(['Removed SPM.mat in art_analysis directory for ' subjects{s}]);
@@ -75,21 +80,28 @@ for s = 1:nSub
         mvmtstr = sprintf('*f-run%03d*.txt',i);
         fnames = dir(mvmtstr);
         movement = load(fnames.name);
-        outliers = load(['art_regression_outliers_swrf-run' sprintf('%03d',i) '-001.mat']);
+        outliers = load(['art_regression_outliers_' artstring '-run' sprintf('%03d',i) '-001.mat']);
         
         R = [outliers.R movement];
-        system(['cp art_regression_outliers_and_movement_swrf-run' sprintf('%03d',i) '-001.mat ' 'art_regression_outliers_and_movement_composite_swrf-run' sprintf('%03d',i) '-001.mat']);
-        save(['art_regression_outliers_and_movement_swrf-run' sprintf('%03d',i) '-001.mat'],'R');
+        system(['cp art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' 'art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
+        save(['art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');
+    end
+    
+    if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])
+        useMovement = true;
     end
     
     
-    % replace the regression coefficients
+    % replace the regression coefficients    
     if useMovement
-        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_and_movement_swrf-$1.mat');
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-00$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-0$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-$1.mat' 39 '};']);
     else
-        fcontents = regexprep(fcontents,'rp_f-(.*).txt','art_regression_outliers_swrf-$1.mat');
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-00$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-0$1.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-$1.mat' 39 '};']);
     end
-
     
     % replace the analysis directory
     fcontents = regexprep(fcontents,'matlabbatch\{1\}\.spm\.stats\.fmri_spec\.dir = \{(.*)/analysis','matlabbatch{1}.spm.stats.fmri_spec.dir = {$1/art_analysis/');
@@ -99,9 +111,9 @@ for s = 1:nSub
     
     for i = 1:nRuns
         if useMovement
-            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_and_movement_swrf-run%03d-001.mat',i)];
+            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/art_regression_outliers_and_movement_' artstring sprintf('-run%03d-001.mat',i)];
         else
-            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/' sprintf('art_regression_outliers_swrf-run%03d-001.mat',i)];
+            loadstr = ['load ' base_dir '/' subjects{s} '/preproc/art_regression_outliers_' artstring sprintf('-run%03d-001.mat',i)];
         end
 
         eval(loadstr)
