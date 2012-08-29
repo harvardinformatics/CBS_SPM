@@ -87,7 +87,7 @@ for s = 1:nSub
         save(['art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');
     end
     
-    if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])
+    if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])))
         useMovement = true;
     end
     
