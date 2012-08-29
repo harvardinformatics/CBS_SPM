@@ -38,8 +38,8 @@ for s = 1:nSub
     % find the name of the file and hold on to the random letters
     d = dir([subjectDir '/preproc/art_regression_outliers_*.mat']);
     artname = d(1).name;
-    r = regexp(artname,'art_regression_outliers_(.*)-run(.*)','tokens');
-    artstring = r{1,1};
+    r = regexp(artname,'art_regression_outliers_and_movement_composite_(.*)-run(.*)','tokens');
+    artstring = r{1}{1};
     
     
 
@@ -75,14 +75,14 @@ for s = 1:nSub
     % construct the outlier and movement files without the composite
     
     for i = 1:nRuns
-        mvmtstr = sprintf('*f-run%03d*.txt',i);
+        mvmtstr = sprintf([subjectDir '/preproc/*f-run%03d*.txt'],i);
         fnames = dir(mvmtstr);
-        movement = load(fnames.name);
-        outliers = load(['art_regression_outliers_' artstring '-run' sprintf('%03d',i) '-001.mat']);
+        movement = load([subjectDir '/preproc/' fnames.name]);
+        outliers = load([subjectDir '/preproc/art_regression_outliers_' artstring '-run' sprintf('%03d',i) '-001.mat']);
         
         R = [outliers.R movement];
-        system(['cp art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' 'art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
-        save(['art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');
+        system(['cp ' subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' subjectDir '/preproc/art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
+        save([subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');
     end
     
     if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])))
@@ -167,7 +167,7 @@ for s = 1:nSub
         end
         fcontents = regexprep(fcontents,findre,replacere);
         
-        
+        system(['cp ' subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' subjectDir '/preproc/art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);
         % add in the zero paddings for f contrast
         
         replacere = [''];
@@ -185,7 +185,7 @@ for s = 1:nSub
             if strloc
                 insideF = true;
             elseif endloc 
-                insideF = false;
+            system(['cp ' subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat ' subjectDir '/preproc/art_regression_outliers_and_movement_composite_' artstring '-run' sprintf('%03d',i) '-001.mat']);    insideF = false;
             end
             if insideF
                 fcontents{linenum} = regexprep(fcontents{linenum},findre,replacere);
