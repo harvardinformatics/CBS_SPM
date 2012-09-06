@@ -9,6 +9,8 @@
 %--------------------------------------------------------------------------
 function genL1PostArt(base_dir,subjects,batchnames,useMovement)
 
+
+
 if ~iscell(batchnames)
     error('Please enter the batchnames as a cell array.')
 end
@@ -89,21 +91,26 @@ for s = 1:nSub
         save([subjectDir '/preproc/art_regression_outliers_and_movement_' artstring '-run' sprintf('%03d',i) '-001.mat'],'R');            
     end
     
+    
+    
     if isempty(cell2mat(regexp(fcontents,['.multi_reg = {' 39 39 '}'])))
         useMovement = true;
+    else
+        useMovement = false;        
     end
     
     
     % replace the regression coefficients    
     disp('Replacing regression coefficients with values from ART')
+    pathstr = [base_dir '/' subjects{s} '/preproc/'];
     if useMovement
-        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run00$1-001.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run0$1-001.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_and_movement_' artstring '-run$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_and_movement_' artstring '-run00$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_and_movement_' artstring '-run0$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_and_movement_' artstring '-run$1-001.mat' 39 '};']);
     else
-        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run00$1-001.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run0$1-001.mat' 39 '};']);
-        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 'art_regression_outliers_' artstring '-run$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_' artstring '-run00$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_' artstring '-run0$1-001.mat' 39 '};']);
+        fcontents = regexprep(fcontents,'sess\((\d\d\d)\)\.multi_reg = .*',['sess($1).multi_reg = {' 39 pathstr 'art_regression_outliers_' artstring '-run$1-001.mat' 39 '};']);
     end
     
     % replace the analysis directory
