@@ -26,7 +26,7 @@ the default environment as specified on the FAQ site (http://cbs.fas.harvard.edu
 
 
 Directory structure:
-The scripts relys on the following directory structure which will automatically be created for you via the first script, getsubject.m.
+The scripts relys on the following directory structure which will automatically be created for you via the first script, getSubjectSPM.py.
 
 #+begin_example
    |-mystudydir   
@@ -54,21 +54,21 @@ one listed on the FAQ site
 
 | Script Name           | Details                                                     |
 |-----------------------+-------------------------------------------------------------|
-| ~getSubjectSPM.py~        | Pulls data using ~cbsget~ and creates a directory structure |
-| ~genPreprocBatches.py~  | Generates preprocessing batches from template batch and executes batches |
+| ~getSubjectSPM.py~    | Pulls data using ~cbsget~ and creates a directory structure |
+| ~genPreprocBatches.py~| Generates preprocessing batches from template batch and executes batches |
 | ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
-| ~genArtFiles.py~     | Generates Art command and runs it  |
-| ~genL1ArtBatches.py~      | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
+| ~genArtFiles.py~      | Generates Art command and runs it  |
+| ~genL1ArtBatches.py~  | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
-* ~getsubject.py~
+* ~getSubjectSPM.py~
 
-~getsubject.py~ is a script that pulls data from the CBS
-repository (or a directory), converts it to SPM format (img), and creates a directory structure for 
-it that will allow the use of the other scripts described here for GUI free analysis of spm data. 
+~getSubjectSPM.py~ is a script that pulls data from the CBS
+repository (or a directory), converts it to SPM format (img or nii), and creates a directory structure for 
+it that will allow the use of the other scripts described here. 
 
-It takes the following inputs in any order.  For help, type getsubject -h:
+It takes the following inputs in any order.  For help, type getSubjectSPM.py -h:
 
-getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
+getSubjectSPM.py -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH -d DICOMPATH -n USENIFTI
 
 |--------+-------------+-------------------------------------------------------------|
 |Flag    | Stands for  | Description                                                 |
@@ -87,14 +87,21 @@ getsubject -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATIONPATH
 |--------+-------------+-------------------------------------------------------------|
 | -d     | dicom path  | the path to a single directory containing all of the unzipped dicoms (as opposed to using CBSCentral|
 |--------+-------------+-------------------------------------------------------------|
+| -n     | use nifti  | If present, will use the single file NIFTI format (nii) insted of img/hdr|
+|--------+-------------+-------------------------------------------------------------|
 
 For example:
 #+begin_example
-~getsubject -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/~
+~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -n
+#+end_example
+
+For getting dicom's locally as opposed to CBSCentral (make sure not to have final / after path to dicoms):
+#+begin_example
+~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -d /ncf/mylab/myspace/myexp/dicoms/subj1 
 #+end_example
 
 This creates the following directory tree:
-
+#+begin_example
    |-myexp   
    |----120418_spmtest
    |-------RAW
@@ -104,10 +111,11 @@ This creates the following directory tree:
    |-------batch
    |-------preproc
    |-------output_files
+#+end_example
 
 Within the ~RAW~ directory is a tarball (subjectid.tar.gz)
 containing the DICOMs in a compressed format.  In the ~preproc~ directory
-will be the SPM converted files .img and .hdr. 
+will be the SPM converted files either nii or .img and .hdr. 
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
@@ -138,13 +146,13 @@ your batch via the 'save as script' command in SPM. This creates a
 batchname_job.m file, which will serve as your template batch. This batch will be
 applied to all of the subjects provided, which can include the original subject 
 that was used to create the template. This script has been tested with fieldmap, slice time correction,
-motion correction, indirect spatial normalization, smoothing. If you use any additional steps, you 
-should check that the generated batches are correct.
+motion correction, indirect spatial normalization, and smoothing. If you use any additional steps, you 
+should check that the generated batches are correct by comparing the ones created to the original.  
 
 
-genPreprocBatches -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
+genPreprocBatches.py -t TEMPLATE -p PATH -s SUBJECT1 SUBJECT2 \\
 or \\
-genPreprocBatches -t TEMPLATE -p PATH -f SUBJECTFILE
+genPreprocBatches.py -t TEMPLATE -p PATH -f SUBJECTFILE
 |--------+-------------+-------------------------------------------------------------|
 |Flag    | Stands for  | Description                                                 |
 |--------+-------------+-------------------------------------------------------------|
