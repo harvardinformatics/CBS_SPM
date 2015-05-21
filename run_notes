@@ -1,0 +1,114 @@
+#on login4
+
+python getSubjectSPM.py -p ~/mri01_users/mcmains/spm_scripting/centos6/login4 -s 110808_12v32vis_SubjA_12ch -b 17 21 32 36 47 51 -t 5 -n
+
+
+#on ncfws06
+#python getSubjectSPM.py -p ~/mri01_users/mcmains/spm_scripting/centos6/ -s 110808_12v32vis_SubjA_12ch -b 17 21 32 36 47 51 -t 5 -n
+
+
+#had to change for nii files
+
+python genPreprocBatches.py -t ~/mri01_users/mcmains/spm_scripting/centos6/110808_12v32vis_SubjA_12ch/batch/preproc_nounwarp_ver1_nii_job.m -p ~/mri01_users/mcmains/spm_scripting/centos6 -s 110808_12v32vis_SubjA_12ch
+
+#failed attempt: think this works...
+srun -n 1 -p ncf -t 90 --mem=1750 -o 110808_ouput2 -e 110808_error2 python getSubjectSPM.py -p ~/mri01_users/mcmains/spm_scripting/centos6/login4 -s 110808_12v32vis_SubjA_12ch -b 17 -t 5 -n&
+
+#but couldn't get this
+srun -n 1 -p ncf -t 90 --mem=1750 -o 110808_srunpreproc_ouput -e 110808_srunpreproc_error matlab -nodisplay -r "/users/mcmains/mri01_users/mcmains/spm_scripting/CBS/runSPMBatch('/users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/preproc_nounwarp_ver1_job.m')"&
+
+#got it to run, by doint interactive srun 
+srun -n 2 -p ncf -t 90 --mem=3000 matlab -nodisplay
+#from CBS directory 
+runSPMBatch('/users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/preproc_nounwarp_ver1_job.m')
+
+#tryint without any fancy scripts
+matlab -nodisplay -r "spm('defaults', 'FMRI'),spm_jobman('initcfg'), spm_jobman('run', '~/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/preproc_mc_job.m' )"
+
+
+
+
+
+
+##interactive job
+srun --pty --x11=first -p ncf -t 20 -n 12 --mem=2048 tksurfer subj5 lh inflated
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!
+summary through srun:
+
+Motion correct:
+bsub v bsub2: Y
+bsub v bsuball: Y
+bsub v bsuball2: Y
+
+bsub v srun: Y
+bsub v srun2: Y
+bsub v srun3: Y
+bsub v srun4: Y
+bsub v srun5: Y
+bsub v srunall: N (61 match)
+bsub v srunall2: N (60 match)
+bsub v srunall3: Y (after power failure)
+bsub v srunall4: Y
+bsub v srunall5: Y
+
+Spatial normalization:
+Differences in bold data probably stem from differences in initial struct to mni space.  In bsuball v bsuall2, both the ms-struct.nii and the ws-struct.nii match, but in bsuball vs srunall4 (where normalizing and smoothing match on the funct) only ms-struct.nii matches, so i am guessing that is the key one. 
+
+bsuball v bsuball2: Y
+bsuball v srunall: N (none)
+bsuball v srunall3: N (none)
+bsuball v srunall4: Y
+bsuball v srunall5: N
+
+
+Smoothing:
+bsuball v bsuball2: Y
+bsuball v srunall: N (none)
+bsuball v srunall2: N (none)
+bsuball v srunall3: N (none)
+bsuball v srunall4: Y
+bsuball v srunall5: N
+
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+##running a script directly, from within batch directory: came out the same
+
+matlab -nodisplay -r preproc_mc
+srun -n 2 -p ncf -t 90 --mem=3000 -o srun_mc_ouput -e srun_mc_error matlab -nodisplay -r preproc_mc&
+
+All steps
+bsub -q ncf -o output_run1all.txt "matlab -nodisplay -r preproc_run1all"
+
+##weird finding that when run through the all script, motion correction differs on just a few slices when run via srun, and not always the same slices.....  
+#now trying to run one setp at a time.
+
+#coreg differes, though not sure if would differ normally each time you run it, rerunning via bsub.  came out the same both times via bsub.
+
+#now test through wrapper.
+
+bsub -q ncf -o runspmbatch_bsub_mc matlab -nodisplay -r "/users/mcmains/mri01_users/mcmains/spm_scripting/CBS/runSPMBatch('/users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/preproc_mc_job.m')"
+
+
+
+#when open gedit on login4
+GConf Error: Failed to contact configuration server; some possible causes are that you need to enable TCP/IP networking for ORBit, or you have stale NFS locks due to a system crash. See http://projects.gnome.org/gconf/ for information. (Details -  1: Failed to get connection to session: /bin/dbus-launch terminated abnormally without any error message)
+GConf Error: Failed to contact configuration server; some possible causes are that you need to enable TCP/IP networking for ORBit, or you have stale NFS locks due to a system crash. See http://projects.gnome.org/gconf/ for information. (Details -  1: Failed to get connection to session: /bin/dbus-launch terminated abnormally without any error message)
+
+
+mcmains@ncflogin4:~/mri01_users/mcmains/spm_scripting/centos6/login4
+[2434]rm -R 110808_12v32vis_SubjA_12ch_viasbatch
+rm: cannot remove `110808_12v32vis_SubjA_12ch_viasbatch/output_files/.nfs0000000001521fff00000001': Device or resource busy
+
+When open gedit on ncfws06
+(gedit:12894): Gtk-WARNING **: Attempting to read the recently used resources file at `/users/mcmains/.recently-used.xbel', but the parser failed: Unexpected attribute 'modified' for element 'application'.
+
+(gedit:12894): GLib-CRITICAL **: g_bookmark_file_get_size: assertion `bookmark != NULL' failed
+
+

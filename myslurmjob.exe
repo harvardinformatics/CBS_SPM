@@ -1,0 +1,11 @@
+#! /bin/bash
+
+#SBATCH -n 1
+#SBATCH -t 45
+#SBATCH -p ncf
+#SBATCH --mem=1750
+
+
+matlab -nodisplay -r "runSPMBatch('/users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/preproc_nounwarp_ver1_job.m')" > /users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/110808_12v32vis_SubjA_12ch/batch/../output_files/output_preproc2013_11_20_18h_41m 2> /users/mcmains/mri01_users/mcmains/spm_scripting/centos6/login4/errors_preproc2013_11_20_18h_41m
+
+
