@@ -79,7 +79,7 @@ else
     runstr = runstr(1:end-1);
     
     %cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
-     cbscmd = ['ArcGet.py -a cbscentral -r ' runstr ' -s ' subjectid];
+     cbscmd = ['ArcGet.py -a cbscentral -r ' runstr ' -s ' subjectid ' -o ' destpath];
     
     disp('Running ArcGet as follows:')
     disp(cbscmd)
@@ -103,6 +103,16 @@ else
        % rmdirs(newdirs)
        % error(['DICOM archive could not be unzipped successfully!' 10 result])
    %end
+    lscmd = ['ls ' destpath '/' subjectid '/RAW'];
+    disp('listing RAW directory:')
+    disp(lscmd)
+    
+    [status,result] = system(lscmd);
+    
+    if status~=0
+       % rmdirs(newdirs)
+        error(['Raw directory not successfully created!' 10 result])
+   end
     
     disp('...complete!')
 end
@@ -294,18 +304,18 @@ end
 
 
 if ~exist('dicompath')
-    disp('Removing zip file from CBS...')
+    %disp('Removing zip file from CBS...')
     
     cd(startingwd)
     
-    rmcmd = ['rm ' subjectid '.zip'];
+    %rmcmd = ['rm ' subjectid '.zip'];
     
-    [status,result] = system(rmcmd);
+    %[status,result] = system(rmcmd);
     
-    if status~=0
-        rmdirs(newdirs)
-        error(['Original zip file could not be removed!' 10 result])
-    end
+    %if status~=0
+     %   rmdirs(newdirs)
+     %   error(['Original zip file could not be removed!' 10 result])
+    %end
     
     
     disp('...Complete!')
@@ -319,7 +329,8 @@ end
 
 function [] = rmdirs(dirarray)
 
-disp('Removing top level directory...')
+disp('Removing top level directory...' )
+disp(dirarray(1))
 rmcmd = ['rm -r ' dirarray{1}];
 
 [status,result] = system(rmcmd);
