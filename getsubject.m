@@ -52,7 +52,7 @@ if exist('dicompath')
     [status result] = system(['mkdir ' fullfile(destpath,subjectid,'RAW')]);
     if status~=0
         rmdirs(newdirs)
-        error(['getsubject could not be run successfully!' 10 result])
+        error(['getsubject could not be run successfully, is the path correct?' 10 result])
     end
     newdirs{end+1} = fullfile(destpath,subjectid,'RAW');
     disp('Copying files as follows:')
@@ -78,30 +78,31 @@ else
     % remove the last extraneous comma
     runstr = runstr(1:end-1);
     
-    cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
+    %cbscmd = ['cbsget -r ' runstr ' -s ' subjectid];
+     cbscmd = ['ArcGet.py -a cbscentral -r ' runstr ' -s ' subjectid];
     
-    disp('Running cbsget as follows:')
+    disp('Running ArcGet as follows:')
     disp(cbscmd)
     
     [status,result] = system(cbscmd);
     
     if status~=0
         rmdirs(newdirs)
-        error(['cbsget could not be run successfully!' 10 result])
+        error(['ArcGet could not be run successfully, make sure your config file is set up correctly and the MR session ID is correct!' 10 result])
     end
     
     %%  Unzip the files to the specified directory
     
-    unzipcmd = ['unzip ' subjectid '.zip -d ' destpath];
-    disp('Unzipping data as follows:')
-    disp(unzipcmd)
+    %unzipcmd = ['unzip ' subjectid '.zip -d ' destpath];
+    %disp('Unzipping data as follows:')
+    %disp(unzipcmd)
     
-    [status,result] = system(unzipcmd);
+    %[status,result] = system(unzipcmd);
     
-    if status~=0
-        rmdirs(newdirs)
-        error(['DICOM archive could not be unzipped successfully!' 10 result])
-    end
+    %if status~=0
+       % rmdirs(newdirs)
+       % error(['DICOM archive could not be unzipped successfully!' 10 result])
+   %end
     
     disp('...complete!')
 end
