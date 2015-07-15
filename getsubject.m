@@ -1,4 +1,4 @@
-function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,usesingle,varargin)
+function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,analysisdirs,usesingle,dicompath)
 %GETSUBJECT   Get subject data from the network and convert to spm. 
 %   GETSUBJECT(subjectid, boldruns, structrun,fmruns,destpath[,dicompath]) downloads
 %   data using cbsget, processes it with spm and renames the files and
@@ -16,23 +16,15 @@ function [] = getsubject(subjectid,boldruns,structrun,fmruns,destpath,usesingle,
 
 %% Do error checking on the inputs
 
-% in my test - delete this eventually!
-% structrun = [4];
-% boldruns = [5];
-% fmruns = [6 7];
-% subjectid = '120418_spmtest';
-% destpath = '/tmp';
 
-if nargin>6
-    dicompath = varargin{1};
-end
+
 
 % Has this been run before?
 dircontents = dir([destpath '/' subjectid]);
-
-if length(dircontents)~=0
-    error([destpath '/' subjectid ' appears to have contents.  Please pull data to a location with no contents to avoid file collisions.'])
-end
+%now checkedin python script
+% if length(dircontents)~=0
+%     error([destpath '/' subjectid ' appears to have contents.  Please pull data to a location with no contents to avoid file collisions.'])
+% end
 
 % Get current wd
 startingwd = pwd;
@@ -41,7 +33,7 @@ startingwd = pwd;
 newdirs = {};
 
 %% If we're not using cbs_get, copy the files
-if exist('dicompath')
+if ~isempty(dicompath)
     disp('Not running cbsget: copying files instead')
     [status result] = system(['mkdir ' fullfile(destpath,subjectid)]);
     if status~=0
@@ -119,7 +111,7 @@ end
 
 %% Create the directory structure 
 
-dirnames = {'analysis','batch','preproc','output_files'};
+dirnames = {analysisdirs{1,:},'batch','preproc','output_files'};
 
 for d = 1:length(dirnames)
     
@@ -136,19 +128,21 @@ for d = 1:length(dirnames)
     newdirs{end+1} = [destpath '/' subjectid '/' dirnames{d}];
     
 end
+for d = 1:length(analysisdirs)    
+    mkcmd = ['mkdir ' destpath '/' subjectid '/' analysisdirs{d} '/paradigms'];
+
+    disp('Making new directory as follows:')
+    disp(mkcmd)
+    [status,result] = system(mkcmd);
+
+    if status~=0
+        rmdirs(newdirs)
+        error(['mkdir command could not be run successfully!' 10 result])
+    end
+
     
-mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms'];
-
-disp('Making new directory as follows:')
-disp(mkcmd)
-[status,result] = system(mkcmd);
-
-if status~=0
-    rmdirs(newdirs)
-    error(['mkdir command could not be run successfully!' 10 result])
+    newdirs{end+1} = [destpath '/' subjectid '/' analysisdirs{d} '/paradigms'];
 end
-newdirs{end+1} = [destpath '/' subjectid '/analysis/paradigms'];
-
 
 %% Run spm convert on the files
 
@@ -171,17 +165,19 @@ for b = 1:length(boldruns)
     runstr = sprintf('%04d',boldruns(b));
     newrunstr = sprintf('%03d',b);
     % also make sub-directories for the paradigms
-    mkcmd = ['mkdir ' destpath '/' subjectid '/analysis/paradigms/run' newrunstr];
-    disp('Making new directory as follows:')
-    disp(mkcmd)
-    [status,result] = system(mkcmd);
+    for d = 1:length(analysisdirs)
+        mkcmd = ['mkdir ' destpath '/' subjectid '/' analysisdirs{d} '/paradigms/run' newrunstr];
     
-    if status~=0
-        rmdirs(newdirs)
-        error(['mkdir command could not be run successfully!' 10 result])
+        disp('Making new directory as follows:')
+        disp(mkcmd)
+        [status,result] = system(mkcmd);
+    
+        if status~=0
+            rmdirs(newdirs)
+            error(['mkdir command could not be run successfully!' 10 result])
+        end
+        newdirs{end+1} = [destpath '/' subjectid '/' analysisdirs{d} '/paradigms/run' newrunstr];
     end
-    newdirs{end+1} = [destpath '/' subjectid '/analysis/paradigms/run' newrunstr];
-    
     
     bruns = dir([destpath '/' subjectid '/RAW/*' runstr '-*-*-*']);
     if (length(bruns)<1)
