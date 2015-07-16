@@ -9,9 +9,9 @@
 This document describes the suite of scripts written to take
 a SPM batch file created for one subject and generate identical batch
 files for many subjects.  These batch files are then submitted to the
-cluster via bsub, eliminating the need for the GUI, and speeding up the
+cluster via bsub or sbatch, eliminating the need for the GUI, and speeding up the
 process of analyzing (or reanalyzing) many subjects at once. In order to use
-the scripts, create your desired batch (preproc, or level1) and use the
+the scripts, create your desired batch (preproc, or level1) in the SPM interface and use the
 'save as script' option when saving the batch.  This creates a file called
 batchname_job.m, which will serve as your template for the scripts below.
 
@@ -26,18 +26,18 @@ the default environment as specified on the FAQ site (http://cbs.fas.harvard.edu
 
 
 Directory structure:
-The scripts relys on the following directory structure which will automatically be created for you via the first script, getSubjectSPM.py.
+The scripts rely on the following directory structure which will automatically be created for you via the first script, getSubjectSPM.py.
 
 #+begin_example
    |-mystudydir   
    |---120418_mysubject
    |------RAW
    |---------dicom files...
-   |------analysis
+   |------analysisdir
    |---------paradigms
    |------------run001,run002,...
    |---------------cond1.txt, cond2.txt...
-   |------spm files from first level analysis...
+   |---------spm files from first level analysis...
    |------batch
    |---------spm batches...
    |------preproc
@@ -55,16 +55,13 @@ one listed on the FAQ site
 | Script Name           | Details                                                     |
 |-----------------------+-------------------------------------------------------------|
 | ~getSubjectSPM.py~    | Pulls data using ~cbsget~ and creates a directory structure |
-| ~genPreprocBatches.py~| Generates preprocessing batches from template batch and executes batches |
+| ~genPreprocBatches.py~ | Generates preprocessing batches from template batch and executes batches |
 | ~genL1Batches.py~     | Generates level 1 batches from template and executes them  |
-| ~genArtFiles.py~      | Generates Art command and runs it  |
-| ~genL1ArtBatches.py~  | Regenerates level 1 batches with art regressors and reruns level 1 analysis   |
 
 * ~getSubjectSPM.py~
 
-~getSubjectSPM.py~ is a script that pulls data from the CBS
-repository (or a directory), converts it to SPM format (img or nii), and creates a directory structure for 
-it that will allow the use of the other scripts described here. 
+~getSubjectSPM.py~ is a script that pulls data from the CBSCentral
+repository (or a directory), converts it to SPM format (img or nii), and creates a directory structure that will allow the use of the other scripts described here. 
 
 It takes the following inputs in any order.  For help, type getSubjectSPM.py -h:
 
@@ -89,10 +86,17 @@ getSubjectSPM.py -s SUBJECTID -b BOLDRUNS -t STRUCTRUNS -m FIELDMAP -p DESTINATI
 |--------+-------------+-------------------------------------------------------------|
 | -n     | use nifti  | If present, will use the single file NIFTI format (nii) insted of img/hdr|
 |--------+-------------+-------------------------------------------------------------|
-
+| --analysis-dir     | analysis directory        | a list of directories for future analyses. Default is analysis. Useful if collected multiple experiments in one session.                      |
+|--------+-------------+-------------------------------------------------------------|
+| --vmem     | virtural memory        | amount of memory requested, requred if using sbatch, default is 1024MB                      |
+|--------+-------------+-------------------------------------------------------------|
+| --time     | time        | amount of time script will need, required if using sbatch, default is 2 hours                      |
+|--------+-------------+-------------------------------------------------------------|
+| -run-with     |         | what to execute the script with, choices are bsub, sbatch, or dry. dry means just output the call to getsubject.m, default is sbatch                     |
+|--------+-------------+-------------------------------------------------------------|
 For example:
 #+begin_example
-~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -n
+~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -n --analysis-dir analysis_univariate analysis_mvpa --run-with bsub
 #+end_example
 
 For getting dicom's locally as opposed to CBSCentral (make sure not to have final / after path to dicoms):
