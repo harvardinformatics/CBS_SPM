@@ -95,12 +95,12 @@ It takes the following inputs in any order.  For help, type getSubjectSPM.py -h:
 |--------+-------------+-------------------------------------------------------------|
 For example:
 #+begin_example
-~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -n --analysis-dir analysis_univariate analysis_mvpa --run-with bsub~
+getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -n --analysis-dir analysis_univariate analysis_mvpa --run-with bsub
 #+end_example
 
-For getting dicom's locally as opposed to CBSCentral (make sure not to have final / after path to dicoms):
+For getting dicom's locally as opposed to CBSCentral:
 #+begin_example
-~getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -d /ncf/mylab/myspace/myexp/dicoms/subj1~
+getSubjectSPM.py -s 120418_spmtest -b 6 10 11 -t 3 -m 6 7 -p /ncf/mylab/myspace/myexp/ -d /ncf/mylab/myspace/myexp/dicoms/subj1
 #+end_example
 
 This creates the following directory tree:
@@ -145,7 +145,7 @@ in the the study directory ~mystudy~, with the name errors_getsubj_subjid follow
 For example:
 errors_subjid_150101_subj1_2015_07_06_10h_23m
 
-The output from the running of the Arcget command (that comes via the bsub/sbatch output) will be stored in ~mystudy~, with the name output_getsubj_subjid followed by the date and time (to the min). This is where errors thrown by Arcget will show up.
+The output from the running of the Arcget command (that comes via the bsub/sbatch output) will be stored in ~mystudy~, with the name output_getsubj_subjid followed by the date and time (to the min). This is where errors thrown by Arcget will show up, such as if the subject ID doesn't exist.
 
 For example:
 output_subjid_150101_subj1_2015_06_20_11h_41m
@@ -154,12 +154,12 @@ output_subjid_150101_subj1_2015_06_20_11h_41m
 
 The goal of this script is to take a batch file created to perform preprocessing
 on a single subject and use it to analyze many subjects.  This is done by saving
-your batch via the 'save as script' command in SPM. This creates a 
+your batch via the ~'save as script'~ command in SPM. This creates a 
 batchname_job.m file, which will serve as your template batch. This batch will be
 applied to all of the subjects provided, which can include the original subject 
 that was used to create the template. This script has been tested with fieldmap, slice time correction,
 motion correction, indirect spatial normalization, and smoothing. If you use any additional steps, you 
-should check that the generated batches are correct by comparing the ones created to the original.  
+should check that the generated batches are correct by comparing the ones created to the original. Essenetially all it does is replace the listed path with the path to your new subject.  
 
 
 |--------+-------------+-------------------------------------------------------------|
@@ -185,7 +185,7 @@ should check that the generated batches are correct by comparing the ones create
 
 For example:
 #+begin_example
-~genPreprocBatches -t /ncf/mylab/myspace/myexp/subject1/batch/preproc_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2 --run-with bsub~ 
+genPreprocBatches -t /ncf/mylab/myspace/myexp/subject1/batch/preproc_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2 --run-with bsub 
 #+end_example
 
 This will create a batch file for each subject provided, and save it in ~subjid/batches~.
@@ -219,7 +219,7 @@ The names you use for your conditions will need to be the names of the text
 files containing your stimulus onset values (see below), so don't put spaces in the name.
 3. When you make your contrasts in Contrast Manager, you can use either the T- and F-contrasts,
 or the T-contrast (cond/sess based) options.  The cond/sess method
-is preferred, as it is harder to make errors.  However, you will still need to build your F-contrast by hand.
+is preferred, as it is harder to make errors.  
 
 *** Running script
 
@@ -246,7 +246,7 @@ is preferred, as it is harder to make errors.  However, you will still need to b
 
 For example:
 #+begin_example
-~genL1Batches -t /ncf/mylab/myspace/myexp/subject1/batch/L1_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2~ 
+genL1Batches -t /ncf/mylab/myspace/myexp/subject1/batch/L1_job.m -p /ncf/mylab/myspace/myexp/ -s subject1 subject2
 #+end_example
 
 This will create a batch file for each subject provided, and save it in ~subjid/batches~.
