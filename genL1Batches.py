@@ -137,9 +137,12 @@ def launch(matlab_cmd, stdout, stderr, args):
     elif args.run_with == "bsub":
         bsub = which("bsub", fail=True)
         cmd = [bsub, "-q", "ncf", "-o", stdout, "-e", stderr, matlab_cmd]
-    logger.debug("executing: %s" % cmd)
+    fullcommand=' '.join(cmd)
+    logger.info("executing: \n%s" % fullcommand)
+
     output = sp.check_output(cmd)
-    #logger.debug(output)
+    logger.info("job handler response: \n%s" % output)
+
 
 def which(c, fail=False):
     for p in os.environ["PATH"].split(':'):
