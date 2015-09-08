@@ -68,7 +68,7 @@ def main():
     #             cbsget, but you do have the dicoms already unzipped in a folder.
 
     # getsubject(subjectid,boldruns,structrun,fmruns,destpath,analysisdirs, nii, dicompath)
-    runcmd = "matlab -nodisplay -r \"try; getsubject('%s', [%s], [%s], [%s], '%s', {%s}, '%s', '%s'); catch ME; disp(ME.message); end; exit()\""
+    runcmd = "matlab -nodisplay -nojvm -r \"try; getsubject('%s', [%s], [%s], [%s], '%s', {%s}, '%s', '%s'); catch ME; disp(ME.message); end; exit()\""
 
     boldruns = "%s" % ",".join(args.boldruns)
     structrun = "%s" % args.structrun
@@ -78,7 +78,7 @@ def main():
     analysisdir = ",".join(["'%s'" % x for x in args.analysis_dir])
     hasnifti = 1 if args.nii else 0
     runcmd = runcmd % (args.subjectid, boldruns, structrun, fieldmap, args.destpath, analysisdir, hasnifti, args.dicompath)
-    logger.info("matlab command: %s" % runcmd)
+    #logger.info("matlab command: %s" % runcmd)
 
     timestamp = dt.datetime.now().strftime("%Y_%m_%d_%Hh_%Mm")
     stderr = os.path.join(args.destpath, "errors_getsubj_%s" % timestamp)
@@ -96,8 +96,11 @@ def launch(matlab_cmd, stdout, stderr, args):
     elif args.run_with == "bsub":
         bsub = which("bsub", fail=True)
         cmd = [bsub, "-q", "ncf", "-o", stdout, "-e", stderr, matlab_cmd]
-    logger.debug("executing: %s" % cmd)
+    fullcommand=' '.join(cmd)
+    logger.info("executing: \n%s" % fullcommand)
+
     output = sp.check_output(cmd)
+    logger.info("job handler response: \n%s" % output)
 
 def which(c, fail=False):
     for p in os.environ["PATH"].split(':'):
