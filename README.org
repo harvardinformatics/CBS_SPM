@@ -122,7 +122,7 @@ will be the SPM converted files either nii or .img and .hdr.
 
 The files have also been renamed.  Because they are already in the
 subject directory, they have been stripped of their subjectid, and are
-renamed as follows:
+renamed as follows below.  Importantly, the functional runs will be named in the order you specify them after the -b flag. Thus, the first bold number specified wil be run001.  This is useful if you collect data for multiple experiments in a scan session, and the order of experiments is varied across subjects.  For instance, if you run a session with two studies, with three runs each, sometimes with expA first, some subjects with expB first. For ease of analysis later, you want the first three runs after renaming to always be expA, and runs 4-6 to be expB.  You can do this by chaning the order of the bolds for the different subjects.  -b 5 6 7 8 9 10 for those with expA first, and -b 8 9 10 5 6 7 with expB first.
 
 |-------------------------+---------------------------------------------|
 | File name               | Description                                 |
